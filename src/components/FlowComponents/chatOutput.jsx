@@ -16,11 +16,10 @@ function ChatOutputNode({ id, data }) {
     getHistory,
     updateChildrenPosition,
     onUpdateUserInput,
-    deleteCurrentNode,
+    deleteUserNode,
     createNewInputNode,
   } = useStore(useCallback((state) => state, []));
   const [streamContent, setStreamContent] = useState("");
-  const [height, setHeight] = useState(0);
 
   function escapeHtml(html) {
     return html
@@ -35,7 +34,10 @@ function ChatOutputNode({ id, data }) {
     const regex = /`([^`]+)`/g;
     return (
       "<p class='mt-3 chatoutput nodrag'>" +
-      escapeHtml(line).replace(regex, "<span class='font-bold bg-gray-700 p-1 rounded'>$1</span>") +
+      escapeHtml(line).replace(
+        regex,
+        "<span class='font-bold bg-gray-700 p-1 rounded'>$1</span>"
+      ) +
       "</p>\n"
     );
   }
@@ -107,7 +109,7 @@ function ChatOutputNode({ id, data }) {
       }
     }
 
-    fetchStreamData();
+    // fetchStreamData();
   }, []);
 
   useEffect(() => {
@@ -118,8 +120,6 @@ function ChatOutputNode({ id, data }) {
     if (height > 520) {
       updateChildrenPosition(newId);
     }
-
-    setHeight(height);
   }, [streamContent]);
 
   return (
@@ -129,7 +129,7 @@ function ChatOutputNode({ id, data }) {
       className="w-[720px] min-h-[520px] overflow-y-scroll flex items-left justify-start overflow-hidden pb-10"
     >
       <div className="absolute top-1 right-1 hover:cursor-pointer">
-        <MdDelete fill="red" size={20} onClick={() => deleteCurrentNode(id)} />
+        <MdDelete fill="red" size={20} onClick={() => deleteUserNode(id)} />
       </div>
       <Handle type="source" position={Position.Bottom} />
       <Handle type="target" position={Position.Top} />
@@ -141,7 +141,7 @@ function ChatOutputNode({ id, data }) {
         <IoIosAdd
           size={30}
           className="hover:cursor-pointer"
-          onClick={() => createNewInputNode(id, height)}
+          onClick={() => createNewInputNode(id)}
         />
       </div>
     </Container>

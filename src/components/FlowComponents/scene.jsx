@@ -16,7 +16,7 @@ const selector = (state) => ({
   onConnect: state.onConnect,
   openAIConfig: state.openAIConfig,
   createOpenAIInstance: state.createOpenAIInstance,
-  deleteChildrenNodes: state.deleteChildrenNodes,
+  deleteChatNode: state.deleteChatNode,
   
 });
 
@@ -27,7 +27,7 @@ function Flow() {
     edges,
     onNodesChange,
     onEdgesChange,
-    deleteChildrenNodes,
+    deleteChatNode,
     openAIConfig,
     createOpenAIInstance,
   } = useStore(selector, (state, next) => {
@@ -39,7 +39,7 @@ function Flow() {
       state.onConnect === next.onConnect &&
       state.openAIConfig === next.openAIConfig &&
       state.createOpenAIInstance === next.createOpenAIInstance &&
-      state.deleteChildrenNodes === next.deleteChildrenNodes
+      state.deleteChatNode === next.deleteChatNode
     );
   });
   const [currentNodeLength, setCurrentNodeLength] = useState(nodes.length);
@@ -79,7 +79,7 @@ function Flow() {
   );
 
   const onNodesDelete = (nodesDeleted) => {
-    deleteChildrenNodes(nodesDeleted, nodes, edges);
+    deleteChatNode(nodesDeleted, nodes, edges);
   }
 
   return (
