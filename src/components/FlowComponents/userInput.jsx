@@ -40,7 +40,7 @@ function UserInputNode({ data }) {
   };
 
   return (
-    <Container title="Input" innerRef={nodeRef}>
+    <Container title="Input" innerRef={nodeRef} id={id}>
       <TextArea
         disabled={openAIInstance == null}
         label=""

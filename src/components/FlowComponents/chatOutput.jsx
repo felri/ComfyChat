@@ -5,7 +5,6 @@ import Container from "../Common/container";
 import { MdDelete } from "react-icons/md";
 import hljs from "highlight.js";
 import { IoIosAdd } from "react-icons/io";
-
 import "highlight.js/styles/atom-one-dark.css"; // Or any other style you prefer
 
 function ChatOutputNode({ id, data }) {
@@ -102,14 +101,12 @@ function ChatOutputNode({ id, data }) {
           });
         }
         onUpdateUserInput(current, data.id);
-
-        // update node data text
       } catch (error) {
         console.error("Error streaming data:", error);
       }
     }
 
-    // fetchStreamData();
+    fetchStreamData();
   }, []);
 
   useEffect(() => {
@@ -127,6 +124,7 @@ function ChatOutputNode({ id, data }) {
       innerRef={containerRef}
       title="Output"
       className="w-[720px] min-h-[520px] overflow-y-scroll flex items-left justify-start overflow-hidden pb-10"
+      id={id}
     >
       <div className="absolute top-1 right-1 hover:cursor-pointer">
         <MdDelete fill="red" size={20} onClick={() => deleteUserNode(id)} />

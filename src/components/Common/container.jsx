@@ -1,8 +1,28 @@
-function Container({ children, title = "Title", className = "", innerRef }) {
+import React, { useState } from "react";
+import { useOnSelectionChange } from "reactflow";
+
+function Container({
+  children,
+  title = "Title",
+  className = "",
+  innerRef,
+  id,
+}) {
+  const [selectedNodes, setSelectedNodes] = useState([]);
+  useOnSelectionChange({
+    onChange: ({ nodes }) => {
+      setSelectedNodes(nodes.map((node) => node.id));
+    },
+  });
+
+  const isSelected = selectedNodes.includes(id);
+
   return (
     <div
       ref={innerRef}
-      className={` ${className} relative flex flex-col items-left justify-start text-left p-4 pt-7 border-2 border-gray-800 rounded-md bg-gray-900`}
+      className={` ${className} relative flex flex-col items-left justify-start text-left p-4 pt-7 border-2 border-gray-800 rounded-sm bg-gray-900 ${
+        isSelected ? "border-blue-500" : ""
+      }`}
     >
       <h1 className="absolute top-0 left-0 flex items-center justify-center w-full text-sm text-white bg-gray-800 p-1">
         {title}

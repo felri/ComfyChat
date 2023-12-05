@@ -140,7 +140,7 @@ function deleteNodeAndParent(nodes, edges, nodeId) {
   const parentId = parentEdge ? parentEdge.source : null;
 
   // If there is no parent, just remove the current node
-  if (!parentId) {
+  if (!parentId || !parentId === "2" || !parentId === "1") {
     return {
       nodes: nodes.filter((node) => node.id !== nodeId),
       edges: edges.filter(

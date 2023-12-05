@@ -42,7 +42,7 @@ function OpenAIConfigNode() {
   );
 
   return (
-    <Container title="OpenAI Config">
+    <Container title="OpenAI Config" id="1">
       <TextInput
         type="password"
         label="API Key"

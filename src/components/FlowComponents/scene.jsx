@@ -17,7 +17,6 @@ const selector = (state) => ({
   openAIConfig: state.openAIConfig,
   createOpenAIInstance: state.createOpenAIInstance,
   deleteChatNode: state.deleteChatNode,
-  
 });
 
 function Flow() {
@@ -47,6 +46,18 @@ function Flow() {
   // fitview when nodes change
   useEffect(() => {
     if (nodes.length === currentNodeLength) return;
+
+    // if less than previous, fitview last three nodes
+    if (nodes.length < currentNodeLength) {
+      const lastThreeNodes = nodes.slice(-3);
+      fitView({
+        nodes: lastThreeNodes,
+        duration: 500,
+      });
+      setCurrentNodeLength(nodes.length);
+      return;
+    }
+
     setCurrentNodeLength(nodes.length);
     const lastTwoNodes = nodes.slice(-2);
     fitView({
@@ -80,7 +91,7 @@ function Flow() {
 
   const onNodesDelete = (nodesDeleted) => {
     deleteChatNode(nodesDeleted, nodes, edges);
-  }
+  };
 
   return (
     <div className="w-screen h-screen">
