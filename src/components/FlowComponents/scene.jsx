@@ -16,6 +16,8 @@ const selector = (state) => ({
   onConnect: state.onConnect,
   openAIConfig: state.openAIConfig,
   createOpenAIInstance: state.createOpenAIInstance,
+  deleteChildrenNodes: state.deleteChildrenNodes,
+  
 });
 
 function Flow() {
@@ -25,7 +27,7 @@ function Flow() {
     edges,
     onNodesChange,
     onEdgesChange,
-    onConnect,
+    deleteChildrenNodes,
     openAIConfig,
     createOpenAIInstance,
   } = useStore(selector, (state, next) => {
@@ -34,7 +36,10 @@ function Flow() {
       state.edges === next.edges &&
       state.onNodesChange === next.onNodesChange &&
       state.onEdgesChange === next.onEdgesChange &&
-      state.onConnect === next.onConnect
+      state.onConnect === next.onConnect &&
+      state.openAIConfig === next.openAIConfig &&
+      state.createOpenAIInstance === next.createOpenAIInstance &&
+      state.deleteChildrenNodes === next.deleteChildrenNodes
     );
   });
   const [currentNodeLength, setCurrentNodeLength] = useState(nodes.length);
@@ -73,10 +78,15 @@ function Flow() {
     []
   );
 
+  const onNodesDelete = (nodesDeleted) => {
+    deleteChildrenNodes(nodesDeleted);
+  }
+
   return (
     <div className="w-screen h-screen">
       <ReactFlow
         panOnScroll
+        onNodesDelete={onNodesDelete}
         nodeTypes={nodeTypes}
         nodes={nodes}
         onNodesChange={onNodesChange}

@@ -50,6 +50,18 @@ function OpenAIConfigNode() {
         value={openAIConfig.apiKey}
         name="apiKey"
       />
+      <span className="text-xs text-gray-400">
+        You can get your API key {" "}
+        <a
+          href="https://platform.openai.com/api-keys"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-500"
+        >
+          here
+        </a>
+        .
+      </span>
       <Dropdown
         label="Engine"
         onChange={onChange}

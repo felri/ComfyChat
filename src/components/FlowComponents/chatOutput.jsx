@@ -36,7 +36,7 @@ function ChatOutputNode({ data }) {
       if (line.startsWith(backticks)) {
         if (inCodeBlock) {
           // End of a code block
-          formattedText += `<pre><code class="${language}">${escapeHtml(
+          formattedText += `<pre><code class="${language} chatoutput nodrag">${escapeHtml(
             codeContent
           )}</code></pre>\n`;
           inCodeBlock = false;
@@ -49,13 +49,13 @@ function ChatOutputNode({ data }) {
       } else if (inCodeBlock) {
         codeContent += line + "\n";
       } else {
-        formattedText += "<p class='mt-2'>" + escapeHtml(line) + "</p>\n";
+        formattedText += "<p class='mt-3 chatoutput nodrag'>" + escapeHtml(line) + "</p>\n";
       }
     }
 
     // Handle case where stream ends but code block is not closed
     if (inCodeBlock) {
-      formattedText += `<pre><code class="${language}">${escapeHtml(
+      formattedText += `<pre><code class="${language} chatoutput nodrag">${escapeHtml(
         codeContent
       )}</code></pre>\n`;
     }

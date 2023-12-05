@@ -25,6 +25,10 @@ pre {
   padding: 5px;
 }
 
+.chatoutput {
+  user-select: all !important;
+}
+
 a {
   font-weight: 500;
   color: #646cff;

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { addEdge, applyNodeChanges, applyEdgeChanges } from "reactflow";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { persist } from "zustand/middleware";
 
 import OpenAI from "openai";
 
@@ -134,6 +134,36 @@ function createNewOutputNode(
   };
 }
 
+function deleteNodeAndUpdateConnections(nodes, edges, nodeId) {
+  // Find the parent of the node (assuming single parent)
+  const parentEdge = edges.find((edge) => edge.target === nodeId);
+  console.log("parentEdge", parentEdge);
+  const parentId = parentEdge ? parentEdge.source : null;
+  console.log("parentId", parentId);
+
+  // Find direct children of the node
+  const childrenEdges = edges.filter((edge) => edge.source === nodeId);
+  const childrenIds = childrenEdges.map((edge) => edge.target);
+
+  // Remove the node and its direct edges
+  const newNodes = nodes.filter((node) => node.id !== nodeId);
+  const newEdges = edges.filter(
+    (edge) => edge.source !== nodeId && edge.target !== nodeId
+  );
+
+  // Connect each child to the parent of the deleted node, if a parent exists
+  if (parentId) {
+    childrenIds.forEach((childId) => {
+      newEdges.push({ source: parentId, target: childId, animated: false });
+    });
+  }
+
+  return {
+    nodes: newNodes,
+    edges: newEdges,
+  };
+}
+
 function createInputBelowOutputNode(nodes, edges, parentId) {
   const parentNode = nodes.find((node) => node.id === parentId);
   if (!parentNode) {
@@ -224,6 +254,17 @@ const useStore = create(
             return node;
           }),
         }));
+      },
+      deleteChildrenNodes: (nodes) => {
+        nodes.forEach((node) => {
+          let childrenId = parseInt(node.id) + 1;
+          childrenId = childrenId.toString();
+          const layouted = deleteNodeAndUpdateConnections(get().nodes, get().edges, childrenId);
+          set({
+            nodes: layouted.nodes,
+            edges: layouted.edges,
+          });
+        });
       },
       onUpdateUserQuantity: (quantity, id) => {
         set((state) => ({
