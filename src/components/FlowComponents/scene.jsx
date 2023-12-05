@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
-import ReactFlow, { useReactFlow, Background } from "reactflow";
+import ReactFlow, { useReactFlow, Background, Controls } from "reactflow";
 import { useStore } from "../../store";
 import "reactflow/dist/style.css";
 
@@ -79,7 +79,7 @@ function Flow() {
   );
 
   const onNodesDelete = (nodesDeleted) => {
-    deleteChildrenNodes(nodesDeleted);
+    deleteChildrenNodes(nodesDeleted, nodes, edges);
   }
 
   return (
@@ -96,9 +96,11 @@ function Flow() {
         snapToGrid
         snapGrid={[15, 15]}
         minZoom={0.1}
-        maxZoom={2.5}
+        maxZoom={1}
+        zoomActivationKeyCode="Shift"
       >
         <Background />
+        <Controls />
       </ReactFlow>
     </div>
   );

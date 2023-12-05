@@ -44,6 +44,7 @@ function OpenAIConfigNode() {
   return (
     <Container title="OpenAI Config">
       <TextInput
+        type="password"
         label="API Key"
         placeholder="Enter your API key"
         onChange={onChangeKey}
@@ -51,7 +52,7 @@ function OpenAIConfigNode() {
         name="apiKey"
       />
       <span className="text-xs text-gray-400">
-        You can get your API key {" "}
+        You can get your API key{" "}
         <a
           href="https://platform.openai.com/api-keys"
           target="_blank"
@@ -62,6 +63,8 @@ function OpenAIConfigNode() {
         </a>
         .
       </span>
+      <div className="h-1" />
+
       <Dropdown
         label="Engine"
         onChange={onChange}
@@ -69,13 +72,16 @@ function OpenAIConfigNode() {
         name="engine"
         options={openAIModels}
       />
+      <div className="h-2" />
       <TextInput
-        label="Temperature"
+        label="Default temperature"
         placeholder="Enter the temperature"
         onChange={onChange}
         value={openAIConfig.temperature}
         name="temperature"
         type="number"
+        min="0"
+        max="1"
       />
       <Handle type="source" position={Position.Right} id="a" />
     </Container>

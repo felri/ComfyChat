@@ -18,6 +18,10 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+*::-webkit-scrollbar {
+  display: none;
+}
+
 pre {
   margin-top: 10px;
   margin-bottom: 10px;

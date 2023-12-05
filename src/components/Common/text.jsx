@@ -9,6 +9,7 @@ function TextInput({
   label = "Text",
   placeholder = "Enter some text",
   name = "text",
+  ...props
 }) {
   const handleChange = useCallback((evt) => {
     onChange(evt);
@@ -18,6 +19,7 @@ function TextInput({
     <div className="flex flex-col">
       <label htmlFor="text">{label}</label>
       <input
+        {...props}
         onChange={handleChange}
         className="nodrag"
         value={value}

@@ -26,13 +26,13 @@ const initialNodes = [
 
 const initialEdges = [
   {
-    id: "1-2",
+    id: "e1-2",
     source: "1",
     target: "2",
     animated: false,
   },
   {
-    id: "2-3",
+    id: "e2-3",
     source: "2",
     target: "3",
     animated: false,
@@ -134,27 +134,71 @@ function createNewOutputNode(
   };
 }
 
-function deleteNodeAndUpdateConnections(nodes, edges, nodeId) {
+function deleteOneNode(nodes, edges, nodeId) {
   // Find the parent of the node (assuming single parent)
-  const parentEdge = edges.find((edge) => edge.target === nodeId);
-  console.log("parentEdge", parentEdge);
-  const parentId = parentEdge ? parentEdge.source : null;
-  console.log("parentId", parentId);
+  const currentEdge = edges.find((edge) => edge.target === nodeId);
+  const parentId = currentEdge ? currentEdge.source : null;
 
   // Find direct children of the node
   const childrenEdges = edges.filter((edge) => edge.source === nodeId);
   const childrenIds = childrenEdges.map((edge) => edge.target);
 
-  // Remove the node and its direct edges
-  const newNodes = nodes.filter((node) => node.id !== nodeId);
-  const newEdges = edges.filter(
-    (edge) => edge.source !== nodeId && edge.target !== nodeId
-  );
-
   // Connect each child to the parent of the deleted node, if a parent exists
   if (parentId) {
     childrenIds.forEach((childId) => {
-      newEdges.push({ source: parentId, target: childId, animated: false });
+      edges.push({
+        id: `e${parentId}-${childId}`,
+        source: parentId,
+        target: childId,
+        animated: false,
+      });
+    });
+  }
+
+  return {
+    nodes: nodes.filter((node) => node.id !== nodeId),
+    edges: edges.filter(
+      (edge) => edge.source !== nodeId && edge.target !== nodeId
+    ),
+  };
+}
+
+function deleteNodeAndUpdateConnections(nodes, edges, nodeId) {
+  // Find the parent of the node (assuming single parent)
+  const parentEdge = edges.find((edge) => edge.target === nodeId);
+  const parentId = parentEdge ? parentEdge.source : null;
+
+  // Find direct children of the node
+  const childrenEdges = edges.filter((edge) => edge.source === nodeId);
+  const childrenIds = childrenEdges.map((edge) => edge.target);
+
+  // Find grandchildren (children of the children)
+  const grandchildrenEdges = edges.filter((edge) =>
+    childrenIds.includes(edge.source)
+  );
+  const grandchildrenIds = grandchildrenEdges.map((edge) => edge.target);
+
+  // Remove the node, its direct children, and their edges
+  const newNodes = nodes.filter(
+    (node) => node.id !== nodeId && !childrenIds.includes(node.id)
+  );
+
+  let newEdges = edges.filter(
+    (edge) =>
+      edge.source !== nodeId &&
+      edge.target !== nodeId &&
+      !childrenIds.includes(edge.source)
+  );
+
+  // Connect each grandchild to the parent of the deleted node, if a parent exists
+  if (parentId) {
+    grandchildrenIds.forEach((grandchildId) => {
+      newEdges.push({
+        id: `e${parentId}-${grandchildId}`,
+        source: parentId,
+        target: grandchildId,
+        animated: false,
+      });
     });
   }
 
@@ -255,11 +299,27 @@ const useStore = create(
           }),
         }));
       },
-      deleteChildrenNodes: (nodes) => {
-        nodes.forEach((node) => {
-          let childrenId = parseInt(node.id) + 1;
-          childrenId = childrenId.toString();
-          const layouted = deleteNodeAndUpdateConnections(get().nodes, get().edges, childrenId);
+      deleteCurrentNode: (id) => {
+        const layouted = deleteNodeAndUpdateConnections(
+          get().nodes,
+          get().edges,
+          id
+        );
+        set({
+          nodes: layouted.nodes,
+          edges: layouted.edges,
+        });
+      },
+      deleteChildrenNodes: (deletedNodes, nodes, edges) => {
+        deletedNodes.forEach((node) => {
+          const nodeType = node.type;
+          console.log("nodeType", nodeType);
+          let layouted;
+          if (nodeType === "chatOutput") {
+            layouted = deleteNodeAndUpdateConnections(nodes, edges, node.id);
+          } else if (nodeType === "userInput") {
+            layouted = deleteOneNode(nodes, edges, node.id);
+          }
           set({
             nodes: layouted.nodes,
             edges: layouted.edges,
@@ -280,7 +340,7 @@ const useStore = create(
         const sytemMessage = get().openAIConfig.systemMessage;
         return getMessageHistory(id, sytemMessage, get().nodes, get().edges);
       },
-      onSendUserInput: (id, parentHeight) => {
+      onUserInputSend: (id, parentHeight) => {
         // create a new output node and edge
         const layouted = createNewOutputNode(
           get().nodes,
@@ -301,6 +361,19 @@ const useStore = create(
         set({
           nodes: inputLayouted.nodes,
           edges: inputLayouted.edges,
+        });
+      },
+      createNewInputNode: (id, parentHeight) => {
+        const layouted = createInputBelowOutputNode(
+          get().nodes,
+          get().edges,
+          id,
+          parentHeight
+        );
+
+        set({
+          nodes: layouted.nodes,
+          edges: layouted.edges,
         });
       },
       updateChildrenPosition: (id) => {

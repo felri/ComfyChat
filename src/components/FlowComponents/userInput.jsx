@@ -1,6 +1,6 @@
 // a flow node component that is used as a text input, it uses the textInput component
 
-import { useCallback, useState, useRef } from "react";
+import { useCallback, useState, useRef, useEffect } from "react";
 import { useStore } from "../../store";
 import { Handle, Position, useReactFlow } from "reactflow";
 import Container from "../Common/container";
@@ -13,7 +13,7 @@ function UserInputNode({ data }) {
   const {
     onUpdateUserInput,
     onUpdateUserQuantity,
-    onSendUserInput,
+    onUserInputSend,
     openAIInstance,
   } = useStore(useCallback((state) => state, []));
 
@@ -30,7 +30,7 @@ function UserInputNode({ data }) {
     if (e.key === "Enter" && e.shiftKey && openAIInstance && text.length > 0) {
       // get the width and height via bounding client rect
       const height = nodeRef.current.getBoundingClientRect().height;
-      onSendUserInput(id, height);
+      onUserInputSend(id, height);
     }
   };
 
@@ -40,7 +40,7 @@ function UserInputNode({ data }) {
   };
 
   return (
-    <Container title="User Input" innerRef={nodeRef}>
+    <Container title="Input" innerRef={nodeRef}>
       <TextArea
         disabled={openAIInstance == null}
         label=""
@@ -71,7 +71,9 @@ function UserInputNode({ data }) {
         /> */}
         <IoMdSend
           className="text-2xl text-gray-500 cursor-pointer"
-          onClick={() => onSendUserInput(id, nodeRef?.current?.getBoundingClientRect().width)}
+          onClick={() =>
+            onUserInputSend(id, nodeRef?.current?.getBoundingClientRect().width)
+          }
         />
       </div>
     </Container>
