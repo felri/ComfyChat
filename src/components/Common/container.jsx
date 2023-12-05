@@ -1,7 +1,8 @@
-function Container({ children, title = "Title", classNames = "" }) {
+function Container({ children, title = "Title", className = "", innerRef }) {
   return (
     <div
-      className={`relative flex flex-col items-center justify-center p-4 pt-6 border-2 border-gray-800 rounded-md bg-gray-900 ${classNames}`}
+      ref={innerRef}
+      className={` ${className} relative flex flex-col items-left justify-start text-left p-4 pt-6 border-2 border-gray-800 rounded-md bg-gray-900`}
     >
       <h1 className="absolute top-0 left-0 flex items-center justify-center w-full text-sm text-white bg-gray-800">
         {title}

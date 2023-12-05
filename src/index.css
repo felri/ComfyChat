@@ -18,6 +18,13 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+pre {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  background-color: #0c1319;
+  padding: 5px;
+}
+
 a {
   font-weight: 500;
   color: #646cff;

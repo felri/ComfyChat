@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { useStore } from "../../store";
 import { Handle, Position } from "reactflow";
 import Container from "../Common/container";
-import TextInput from "../Common/textInput";
+import TextInput from "../Common/text";
 import Dropdown from "../Common/dropdown";
 
 const openAIModels = [
