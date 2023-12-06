@@ -107,7 +107,7 @@ function ChatOutputNode({ id, data }) {
       }
     }
 
-    // fetchStreamData();
+    fetchStreamData();
   }, []);
 
   useEffect(() => {
