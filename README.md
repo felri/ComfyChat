@@ -1,8 +1,18 @@
-# React + Vite
+# ComfyChat
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## [Demo](https://comfychat.space/)
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+https://github.com/felri/ComfyChat/assets/56592364/83a84cfb-d1e0-4930-91d8-7997811d6605
+
+
+### Run locally
+
+```bash
+git clone https://github.com/felri/ComfyChat
+cd ComfyChat
+npm i
+npm run dev
+```
+
+
