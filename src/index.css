@@ -100,3 +100,7 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.react-flow__pane {
+  position: fixed !important;
+}

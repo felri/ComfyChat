@@ -1,9 +1,11 @@
 // text area component that can be used in the flow editor
 
-import { useCallback, useRef, useEffect } from "react";
-import TextareaAutosize from 'react-textarea-autosize';
+import { useCallback, useRef, useState } from "react";
+import { useReactFlow } from "reactflow";
+import TextareaAutosize from "react-textarea-autosize";
 
 function TextArea({
+  id,
   onChange,
   value,
   label = "Text",
@@ -13,16 +15,9 @@ function TextArea({
   ...props
 }) {
   const textRef = useRef(null);
+
   const handleChange = useCallback((evt) => {
     onChange(evt);
-  }, []);
-
-  // auto focus the text area when it is first rendered
-  // this is used in the flow editor
-  useEffect(() => {
-    if (autoFocus) {
-      textRef.current.focus();
-    }
   }, []);
 
   // focus on mouse enter
@@ -41,6 +36,7 @@ function TextArea({
         autoFocus={autoFocus}
         onChange={handleChange}
         minRows={7}
+        className="overflow-y-auto"
         value={value}
         name={name}
         placeholder={placeholder}

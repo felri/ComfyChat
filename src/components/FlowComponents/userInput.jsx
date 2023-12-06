@@ -12,41 +12,63 @@ function UserInputNode({ data }) {
 
   const {
     onUpdateUserInput,
-    onUpdateUserQuantity,
     onUserInputSend,
     openAIInstance,
   } = useStore(useCallback((state) => state, []));
 
   const [id] = useState(data.id);
   const [text, setText] = useState(data.text);
-  const [quantity, setQuantity] = useState(data.quantity);
+  const [wordCount, setWordCount] = useState(0);
 
   const onChange = (e) => {
     setText(e.target.value);
     onUpdateUserInput(e.target.value, id);
   };
 
+  function countWords(text) {
+    // count words, not including spaces
+    return text.trim().split(/\s+/).length;
+  }
+
+  useEffect(() => {
+    if (!data?.text?.length) {
+      setWordCount(0);
+      return;
+    }
+    setWordCount(countWords(data.text));
+  }, [data.text]);
+
   const onEnter = (e) => {
-    if (e.key === "Enter" && e.shiftKey && openAIInstance && text.length > 0) {
+    if (
+      e.key === "Enter" &&
+      !e.shiftKey &&
+      openAIInstance &&
+      text.trim().length > 0
+    ) {
       // get the width and height via bounding client rect
       const height = nodeRef.current.getBoundingClientRect().height;
       onUserInputSend(id, height);
     }
   };
 
-  const onChangeQuantity = (e) => {
-    setQuantity(e.target.value);
-    onUpdateUserQuantity(e.target.value, id);
-  };
+  const placeHolderText = openAIInstance
+    ? id === "3"
+      ? `Enter to send
+Shift + Enter new line
+Scroll or drag to any direction
+Shift + Scroll to zoom
++ button adds a new input node
+`
+      : "Message ChatGPT..."
+    : "Please add an API key";
 
   return (
     <Container title="Input" innerRef={nodeRef} id={id}>
       <TextArea
+        id={id}
         disabled={openAIInstance == null}
         label=""
-        placeholder={
-          openAIInstance ? "Shift + Enter to send" : "Please add an API key"
-        }
+        placeholder={placeHolderText}
         value={text}
         rows={16}
         cols={65}
@@ -59,16 +81,8 @@ function UserInputNode({ data }) {
       <Handle type="target" position={Position.Top} />
 
       <div className="flex w-full justify-end pt-4 items-center space-x-2">
-        {/* <p className="text-gray-500 text-sm mr-2">How many times?</p>
-        <input
-          disabled={openAIInstance == null}
-          type="number"
-          min="1"
-          max="10"
-          value={quantity}
-          onChange={onChangeQuantity}
-          className="border border-gray-300 rounded-md w-14 h-8 px-2 text-right"
-        /> */}
+        <p className="text-gray-500 text-sm mr-2">Word Count: {wordCount}</p>
+
         <IoMdSend
           className="text-2xl text-gray-500 cursor-pointer"
           onClick={() =>

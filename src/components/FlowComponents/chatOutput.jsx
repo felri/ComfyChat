@@ -138,7 +138,7 @@ function ChatOutputNode({ id, data }) {
         dangerouslySetInnerHTML={{ __html: formatStreamContent(streamContent) }}
         className=" w-full h-full"
       />
-      <div className="flex justify-center items-center absolute bottom-0 right-0 w-10 h-10 cursor-pointer">
+      <div className="flex justify-center items-center absolute bottom-0 right-0 w-full h-10 cursor-pointer">
         <IoIosAdd
           size={30}
           className="hover:cursor-pointer"
