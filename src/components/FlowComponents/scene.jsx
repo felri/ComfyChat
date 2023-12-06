@@ -76,7 +76,8 @@ function Flow() {
     if (
       !openAIConfig ||
       !openAIConfig.apiKey ||
-      openAIConfig.apiKey.length === 0
+      openAIConfig.apiKey.length === 0 ||
+      openAIConfig.engine.length === 0
     )
       return;
     async function createInstance() {
