@@ -58,7 +58,7 @@ Shift + Scroll to zoom
 + button adds a new input node
 `
       : "Message ChatGPT..."
-    : "Please add an API key";
+    : "Please add an API key and select a model";
 
   return (
     <Container title="Input" innerRef={nodeRef} id={id}>
