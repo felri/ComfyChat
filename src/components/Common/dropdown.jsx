@@ -22,10 +22,6 @@ function Dropdown({
         value={value}
         name={name}
       >
-        <option value="" disabled selected hidden>
-          Select an Option
-        </option>
-
         {options.map((option) => (
           <option key={option} value={option}>
             {option}
