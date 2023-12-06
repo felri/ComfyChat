@@ -6,16 +6,12 @@ import TextInput from "../Common/text";
 import Dropdown from "../Common/dropdown";
 
 const openAIModels = [
-  "gpt-4",
-  "gpt-3.5-turbo-0613",
-  "gpt-3.5-turbo-0301",
-  "gpt-4-0314",
+  "gpt-3.5-turbo-1106",
+  "gpt-3.5-turbo",
   "gpt-4-32k-0314",
   "gpt-4-1106-preview",
   "gpt-4-vision-preview",
   "gpt-4-32k",
-  "gpt-4-0613",
-  "gpt-4-32k-0613",
 ];
 
 function OpenAIConfigNode() {
@@ -72,6 +68,18 @@ function OpenAIConfigNode() {
         name="engine"
         options={openAIModels}
       />
+      <span className="text-xs text-gray-400">
+        You can read about the models{" "}
+        <a
+          href="https://platform.openai.com/docs/models"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-500"
+        >
+          here
+        </a>
+        .
+      </span>
       <div className="h-2" />
       <TextInput
         label="Default temperature"

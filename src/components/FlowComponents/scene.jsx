@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import ReactFlow, { useReactFlow, Background, Controls } from "reactflow";
 import { useStore } from "../../store";
-import "reactflow/dist/style.css";
+import 'reactflow/dist/style.css';
 
 import OpenAIConfigNode from "./openaiConfig";
 import UserInputNode from "./userInput";

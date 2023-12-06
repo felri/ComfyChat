@@ -38,8 +38,13 @@ pre {
   padding: 5px;
 }
 
+code > span {
+  white-space: pre-wrap;
+}
+
 .chatoutput {
-  user-select: all !important;
+  user-select: text !important;
+  pointer-events: auto !important;
 }
 
 a {

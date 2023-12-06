@@ -19,6 +19,7 @@ function ChatOutputNode({ id, data }) {
     createNewInputNode,
   } = useStore(useCallback((state) => state, []));
   const [streamContent, setStreamContent] = useState("");
+  const [currentHeight, setCurrentHeight] = useState(520);
 
   function escapeHtml(html) {
     return html
@@ -111,11 +112,13 @@ function ChatOutputNode({ id, data }) {
 
   useEffect(() => {
     hljs.highlightAll();
-    let newId = parseInt(data.id) + 1;
-    newId = newId.toString();
+    let childId = parseInt(data.id) + 1;
+    childId = childId.toString();
     const height = containerRef.current?.offsetHeight || 0;
-    if (height > 520) {
-      updateChildrenPosition(newId);
+    if (height > currentHeight) {
+      const diff = height - currentHeight;
+      setCurrentHeight(height);
+      updateChildrenPosition(childId, diff);
     }
   }, [streamContent]);
 
@@ -123,7 +126,7 @@ function ChatOutputNode({ id, data }) {
     <Container
       innerRef={containerRef}
       title="Output"
-      className="w-[720px] min-h-[520px] overflow-y-scroll flex items-left justify-start overflow-hidden pb-10"
+      className="w-[750px] min-h-[520px] overflow-y-scroll flex items-left justify-start overflow-hidden pb-10"
       id={id}
     >
       <div className="absolute top-1 right-1 hover:cursor-pointer">
@@ -139,7 +142,7 @@ function ChatOutputNode({ id, data }) {
         <IoIosAdd
           size={30}
           className="hover:cursor-pointer"
-          onClick={() => createNewInputNode(id)}
+          onClick={() => createNewInputNode(id, currentHeight)}
         />
       </div>
     </Container>
