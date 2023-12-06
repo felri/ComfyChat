@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useStore } from "../../store";
 import { Handle, Position } from "reactflow";
 import Container from "../Common/container";
-import { MdDelete } from "react-icons/md";
+import { HiOutlineTrash } from "react-icons/hi2";
 import hljs from "highlight.js";
 import { IoIosAdd } from "react-icons/io";
 import "highlight.js/styles/atom-one-dark.css"; // Or any other style you prefer
@@ -107,7 +107,7 @@ function ChatOutputNode({ id, data }) {
       }
     }
 
-    fetchStreamData();
+    // fetchStreamData();
   }, []);
 
   useEffect(() => {
@@ -130,7 +130,7 @@ function ChatOutputNode({ id, data }) {
       id={id}
     >
       <div className="absolute top-1 right-1 hover:cursor-pointer">
-        <MdDelete fill="red" size={20} onClick={() => deleteUserNode(id)} />
+        <HiOutlineTrash opacity={.7} size={20} onClick={() => deleteUserNode(id)} />
       </div>
       <Handle type="source" position={Position.Bottom} />
       <Handle type="target" position={Position.Top} />
@@ -138,7 +138,7 @@ function ChatOutputNode({ id, data }) {
         dangerouslySetInnerHTML={{ __html: formatStreamContent(streamContent) }}
         className=" w-full h-full"
       />
-      <div className="flex justify-center items-center absolute bottom-0 right-0 w-full h-10 cursor-pointer">
+      <div className="flex justify-end items-center absolute bottom-0 right-0 w-full h-10 cursor-pointer">
         <IoIosAdd
           size={30}
           className="hover:cursor-pointer"

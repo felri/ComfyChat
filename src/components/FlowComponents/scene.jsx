@@ -1,7 +1,13 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
-import ReactFlow, { useReactFlow, Background, Controls } from "reactflow";
+import ReactFlow, {
+  useReactFlow,
+  Background,
+  Controls,
+  Panel,
+} from "reactflow";
 import { useStore } from "../../store";
-import 'reactflow/dist/style.css';
+import { FaGithub } from "react-icons/fa";
+import "reactflow/dist/style.css";
 
 import OpenAIConfigNode from "./openaiConfig";
 import UserInputNode from "./userInput";
@@ -110,6 +116,24 @@ function Flow() {
         maxZoom={1}
         zoomActivationKeyCode="Shift"
       >
+        <Panel position="top-left">
+          <div className="flex justify-center items-start space-y-2 w-full h-12 flex-col">
+            <div className="flex items-center">
+              <img src={"./logo.png"} alt="logo" className="w-6 mr-2 -ml-1" />
+              <p className="text-white text-sm">ComfyChat</p>
+            </div>
+            <a
+              href="https://github.com/felri/ComfyChat"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center text-white decoration-none hover:text-white"
+            >
+              <FaGithub className="mr-2 text-sm" />
+              <p className="text-white text-sm hover:underline">Github</p>
+            </a>
+          </div>
+        </Panel>
+
         <Background />
         <Controls />
       </ReactFlow>

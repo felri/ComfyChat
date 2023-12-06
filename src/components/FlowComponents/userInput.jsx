@@ -6,15 +6,13 @@ import { Handle, Position, useReactFlow } from "reactflow";
 import Container from "../Common/container";
 import TextArea from "../Common/textarea";
 import { IoMdSend } from "react-icons/io";
+import { HiOutlineTrash } from "react-icons/hi2";
 
 function UserInputNode({ data }) {
   const nodeRef = useRef(null);
 
-  const {
-    onUpdateUserInput,
-    onUserInputSend,
-    openAIInstance,
-  } = useStore(useCallback((state) => state, []));
+  const { onUpdateUserInput, onUserInputSend, openAIInstance, deleteUserNode } =
+    useStore(useCallback((state) => state, []));
 
   const [id] = useState(data.id);
   const [text, setText] = useState(data.text);
@@ -64,6 +62,13 @@ Shift + Scroll to zoom
 
   return (
     <Container title="Input" innerRef={nodeRef} id={id}>
+      <div className="absolute top-1 right-1 hover:cursor-pointer">
+        <HiOutlineTrash
+          opacity={0.7}
+          size={20}
+          onClick={() => deleteUserNode(id)}
+        />
+      </div>
       <TextArea
         id={id}
         disabled={openAIInstance == null}
