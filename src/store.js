@@ -327,7 +327,7 @@ const useStore = create(
       openAIInstance: null,
       openAIConfig: {
         apiKey: "",
-        engine: "pt-3.5-turbo-1106",
+        engine: "gpt-3.5-turbo-1106",
         temperature: 0.9,
         systemMessage: "You are a chatbot. You are talking to a human.",
       },
