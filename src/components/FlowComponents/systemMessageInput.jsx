@@ -1,14 +1,16 @@
 // a flow node component that is used as a text input, it uses the textInput component
 
 import { useCallback } from "react";
-import { useStore } from "../../store";
+import { storeManager } from "../../store";
 import { Handle, Position } from "reactflow";
 import Container from "../Common/container";
 import TextArea from "../Common/textarea";
 import { IoIosAdd } from "react-icons/io";
 
 function SystemMessageNode() {
-  const { updateOpenAIConfig, openAIConfig, createNewInputNode } = useStore(
+  const store = storeManager.getSelectedStore();
+
+  const { updateOpenAIConfig, openAIConfig, createNewInputNode } = store(
     useCallback((state) => state, [])
   );
 

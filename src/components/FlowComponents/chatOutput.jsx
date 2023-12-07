@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { useStore } from "../../store";
+import { storeManager } from "../../store";
 import { Handle, Position } from "reactflow";
 import Container from "../Common/container";
 import { HiOutlineTrash } from "react-icons/hi2";
@@ -11,6 +11,8 @@ import "highlight.js/styles/atom-one-dark.css"; // Or any other style you prefer
 
 function ChatOutputNode({ id, data }) {
   const containerRef = useRef(null);
+  const store = storeManager.getSelectedStore();
+
   const {
     openAIInstance,
     openAIConfig,
@@ -19,7 +21,7 @@ function ChatOutputNode({ id, data }) {
     onUpdateUserInput,
     deleteUserNode,
     createNewInputNode,
-  } = useStore(useCallback((state) => state, []));
+  } = store(useCallback((state) => state, []));
   const [streamContent, setStreamContent] = useState("");
   const [currentHeight, setCurrentHeight] = useState(520);
 

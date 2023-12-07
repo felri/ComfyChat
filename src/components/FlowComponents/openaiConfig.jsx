@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useStore } from "../../store";
+import { storeManager } from "../../store";
 import { Handle, Position } from "reactflow";
 import Container from "../Common/container";
 import TextInput from "../Common/text";
@@ -15,7 +15,8 @@ const openAIModels = [
 ];
 
 function OpenAIConfigNode() {
-  const { openAIConfig, updateOpenAIConfig, updateOpenAIKey } = useStore(
+  const store = storeManager.getSelectedStore();
+  const { openAIConfig, updateOpenAIConfig, updateOpenAIKey } = store(
     (state) => state
   );
 

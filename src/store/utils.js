@@ -172,3 +172,9 @@ export function createNewOutputNode(
   };
 }
 
+
+export const generateStoreId = () => {
+  const timestamp = Date.now(); // Unix timestamp in milliseconds
+  const randomString = Math.random().toString(36).substring(2, 6); // Short random string for added uniqueness
+  return `${timestamp}-${randomString}`;
+};

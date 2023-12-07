@@ -5,7 +5,7 @@ import ReactFlow, {
   Controls,
   Panel,
 } from "reactflow";
-import { useStore } from "../../store";
+import { storeManager } from "../../store";
 import { FaGithub } from "react-icons/fa";
 
 import "reactflow/dist/style.css";
@@ -28,6 +28,7 @@ const selector = (state) => ({
 
 function Flow() {
   const { fitView } = useReactFlow();
+  const store = storeManager.getSelectedStore();
   const {
     nodes,
     edges,
@@ -36,7 +37,7 @@ function Flow() {
     deleteChatNode,
     openAIConfig,
     createOpenAIInstance,
-  } = useStore(selector, (state, next) => {
+  } = store(selector, (state, next) => {
     return (
       state.nodes === next.nodes &&
       state.edges === next.edges &&
