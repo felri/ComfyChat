@@ -8,7 +8,7 @@ import TextArea from "../Common/textarea";
 import { IoIosAdd } from "react-icons/io";
 
 function SystemMessageNode() {
-  const { updateOpenAIConfig, openAIConfig, createNewInputNode, nodes } = useStore(
+  const { updateOpenAIConfig, openAIConfig, createNewInputNode } = useStore(
     useCallback((state) => state, [])
   );
 

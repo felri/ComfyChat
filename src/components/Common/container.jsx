@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import PropTypes from "prop-types";
 import { useOnSelectionChange } from "reactflow";
 
 function Container({
@@ -31,5 +32,16 @@ function Container({
     </div>
   );
 }
+
+Container.propTypes = {
+  children: PropTypes.node,
+  title: PropTypes.string,
+  className: PropTypes.string,
+  innerRef: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.shape({ current: PropTypes.any }),
+  ]),
+  id: PropTypes.string,
+};
 
 export default Container;

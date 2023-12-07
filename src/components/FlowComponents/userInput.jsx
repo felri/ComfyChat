@@ -2,11 +2,12 @@
 
 import { useCallback, useState, useRef, useEffect } from "react";
 import { useStore } from "../../store";
-import { Handle, Position, useReactFlow } from "reactflow";
+import { Handle, Position } from "reactflow";
 import Container from "../Common/container";
 import TextArea from "../Common/textarea";
 import { IoMdSend } from "react-icons/io";
 import { HiOutlineTrash } from "react-icons/hi2";
+import PropTypes from "prop-types";
 
 function UserInputNode({ data }) {
   const nodeRef = useRef(null);
@@ -98,5 +99,13 @@ Shift + Scroll to zoom
     </Container>
   );
 }
+
+UserInputNode.propTypes = {
+  data: PropTypes.shape({
+    text: PropTypes.string,
+    id: PropTypes.string,
+    quantity: PropTypes.number,
+  }),
+};
 
 export default UserInputNode;

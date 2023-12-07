@@ -1,6 +1,5 @@
-// a text area component that can be used in the flow editor
-
 import { useCallback } from "react";
+import PropTypes from "prop-types";
 
 function TextInput({
   onChange,
@@ -31,5 +30,14 @@ function TextInput({
     </div>
   );
 }
+
+TextInput.propTypes = {
+  onChange: PropTypes.func,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  type: PropTypes.string,
+  label: PropTypes.string,
+  placeholder: PropTypes.string,
+  name: PropTypes.string,
+};
 
 export default TextInput;

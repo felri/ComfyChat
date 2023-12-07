@@ -1,11 +1,8 @@
-// text area component that can be used in the flow editor
-
-import { useCallback, useRef, useState } from "react";
-import { useReactFlow } from "reactflow";
+import { useCallback, useRef } from "react";
 import TextareaAutosize from "react-textarea-autosize";
+import PropTypes from "prop-types";
 
 function TextArea({
-  id,
   onChange,
   value,
   label = "Text",
@@ -21,7 +18,6 @@ function TextArea({
   }, []);
 
   // focus on mouse enter
-  // this is used in the flow editor
   const handleMouseEnter = useCallback(() => {
     if (autoFocus) {
       textRef.current.focus();
@@ -46,5 +42,15 @@ function TextArea({
     </div>
   );
 }
+
+TextArea.propTypes = {
+  id: PropTypes.string,
+  onChange: PropTypes.func,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  label: PropTypes.string,
+  placeholder: PropTypes.string,
+  name: PropTypes.string,
+  autoFocus: PropTypes.bool,
+};
 
 export default TextArea;

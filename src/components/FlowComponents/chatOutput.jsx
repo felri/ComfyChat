@@ -5,6 +5,8 @@ import Container from "../Common/container";
 import { HiOutlineTrash } from "react-icons/hi2";
 import hljs from "highlight.js";
 import { IoIosAdd } from "react-icons/io";
+import PropTypes from "prop-types";
+
 import "highlight.js/styles/atom-one-dark.css"; // Or any other style you prefer
 
 function ChatOutputNode({ id, data }) {
@@ -130,7 +132,11 @@ function ChatOutputNode({ id, data }) {
       id={id}
     >
       <div className="absolute top-1 right-1 hover:cursor-pointer">
-        <HiOutlineTrash opacity={.7} size={20} onClick={() => deleteUserNode(id)} />
+        <HiOutlineTrash
+          opacity={0.7}
+          size={20}
+          onClick={() => deleteUserNode(id)}
+        />
       </div>
       <Handle type="source" position={Position.Bottom} />
       <Handle type="target" position={Position.Top} />
@@ -148,5 +154,14 @@ function ChatOutputNode({ id, data }) {
     </Container>
   );
 }
+
+ChatOutputNode.propTypes = {
+  id: PropTypes.string,
+  data: PropTypes.shape({
+    text: PropTypes.string,
+    id: PropTypes.string,
+    quantity: PropTypes.number,
+  }),
+};
 
 export default ChatOutputNode;

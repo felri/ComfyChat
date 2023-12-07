@@ -1,6 +1,5 @@
-// a dropdown component
-
 import { useCallback } from "react";
+import PropTypes from "prop-types";
 
 function Dropdown({
   onChange,
@@ -31,5 +30,13 @@ function Dropdown({
     </div>
   );
 }
+
+Dropdown.propTypes = {
+  onChange: PropTypes.func,
+  value: PropTypes.string,
+  label: PropTypes.string,
+  name: PropTypes.string,
+  options: PropTypes.array,
+};
 
 export default Dropdown;
