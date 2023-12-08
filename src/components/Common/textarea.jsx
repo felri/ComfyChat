@@ -32,7 +32,7 @@ function TextArea({
         autoFocus={autoFocus}
         onChange={handleChange}
         minRows={7}
-        className="overflow-y-auto"
+        className="overflow-y-auto nograg"
         value={value}
         name={name}
         placeholder={placeholder}

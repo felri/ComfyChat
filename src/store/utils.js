@@ -1,7 +1,4 @@
-export const defaultEdgeOptions = {
-  animated: false,
-  type: "smoothstep",
-};
+import { defaultEdgeOptions } from "./constants";
 
 export function deleteOneNode(nodes, edges, nodeId) {
   // Find the parent of the node
@@ -46,7 +43,12 @@ export function deleteOneNode(nodes, edges, nodeId) {
   }
 }
 
-export function createInputBelowOutputNode(nodes, edges, parentId, parentHeight) {
+export function createInputBelowOutputNode(
+  nodes,
+  edges,
+  parentId,
+  parentHeight
+) {
   const parentNode = nodes.find((node) => node.id === parentId);
   if (!parentNode) {
     throw new Error("Parent node not found");
@@ -72,7 +74,7 @@ export function createInputBelowOutputNode(nodes, edges, parentId, parentHeight)
     id: `e${parentId}-${newNodeId}`,
     source: parentId,
     target: newNodeId,
-    ...defaultEdgeOptions
+    ...defaultEdgeOptions,
   };
 
   return {
@@ -81,32 +83,54 @@ export function createInputBelowOutputNode(nodes, edges, parentId, parentHeight)
   };
 }
 
+export function getStoredStoreIds() {
+  const storeIds = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith("store-")) {
+      const id = key.substring(6); // Extract ID part of the key
+      storeIds.push(id);
+    }
+  }
+  return storeIds;
+}
 
-export function getMessageHistory(id, systemMessage, nodes, edges) {
+export function getMessageHistory(id, nodes, edges) {
   console.log("getMessageHistory", nodes, edges);
   const history = [];
 
   let currentNodeId = id;
+  let systemMessage = null;
+
   while (currentNodeId !== null) {
     const currentNode = nodes.find((node) => node.id === currentNodeId);
-    if (currentNode && currentNode.data?.text) {
-      // Prepend system messages and user input to the history array.
-      history.unshift({
-        role: currentNode.type === "userInput" ? "user" : "assistant",
-        content: currentNode.data.text,
-      });
+
+    if (currentNode) {
+      if (currentNode.type === "systemMessage") {
+        // If system message is found, store its content.
+        systemMessage = currentNode.data.text;
+      } else if (currentNode.data?.text) {
+        // Prepend user or assistant messages to the history array.
+        history.unshift({
+          role: currentNode.type === "userInput" ? "user" : "assistant",
+          content: currentNode.data.text,
+        });
+      }
     }
+
     // Find the edge that points to the current node.
     const currentEdge = edges.find((edge) => edge.target === currentNodeId);
     // Update the currentNodeId to be the source of the current edge (to move to the previous node).
     currentNodeId = currentEdge ? currentEdge.source : null;
   }
 
-  // Prepend the initial system message to the history array.
-  history.unshift({
-    role: "assistant",
-    content: systemMessage,
-  });
+  // Prepend the system message to the history array if it exists.
+  if (systemMessage) {
+    history.unshift({
+      role: "system",
+      content: systemMessage,
+    });
+  }
 
   return history;
 }
@@ -116,7 +140,7 @@ export function calculateNewNodePosition(nodes, edges, parentId, parentHeight) {
   const verticalSpacing = 150; // Vertical spacing from the parent node
 
   // Find the parent node
-  const parentNode = nodes.find((node) => node.id === parentId);
+  let parentNode = nodes.find((node) => node.id === parentId);
   if (!parentNode) {
     throw new Error("Parent node not found");
   }
@@ -137,12 +161,13 @@ export function calculateNewNodePosition(nodes, edges, parentId, parentHeight) {
   };
 }
 
-export function createNewOutputNode(
+export function createNewNode(
   nodes,
   edges,
   parentId,
   parentHeight,
-  type = "chatOutput"
+  type = "chatOutput",
+  data = {}
 ) {
   const newNodePosition = calculateNewNodePosition(
     nodes,
@@ -155,7 +180,7 @@ export function createNewOutputNode(
   const newNode = {
     id: newNodeId,
     type,
-    data: { text: "", id: newNodeId },
+    data: { text: "", id: newNodeId, ...data },
     position: newNodePosition,
   };
 
@@ -163,7 +188,7 @@ export function createNewOutputNode(
     id: `e${parentId}-${newNodeId}`,
     source: parentId,
     target: newNodeId,
-    ...defaultEdgeOptions
+    ...defaultEdgeOptions,
   };
 
   return {
@@ -171,7 +196,6 @@ export function createNewOutputNode(
     edges: [...edges, newEdge],
   };
 }
-
 
 export const generateStoreId = () => {
   const timestamp = Date.now(); // Unix timestamp in milliseconds

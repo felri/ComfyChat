@@ -9,23 +9,21 @@ import { IoMdSend } from "react-icons/io";
 import { HiOutlineTrash } from "react-icons/hi2";
 import PropTypes from "prop-types";
 
-function UserInputNode({ data }) {
+function UserInputNode({ id, data }) {
   const nodeRef = useRef(null);
   const store = storeManager.getSelectedStore();
-  const { onUpdateUserInput, onUserInputSend, openAIInstance, deleteUserNode } =
+  const { onDataTextUpdate, onUserInputSend, openAIInstance, deleteUserNode } =
     store(useCallback((state) => state, []));
 
-  const [id] = useState(data.id);
   const [text, setText] = useState(data.text);
   const [wordCount, setWordCount] = useState(0);
 
   const onChange = (e) => {
     setText(e.target.value);
-    onUpdateUserInput(e.target.value, id);
+    onDataTextUpdate(e.target.value, id);
   };
 
   function countWords(text) {
-    // count words, not including spaces
     return text.trim().split(/\s+/).length;
   }
 
@@ -50,12 +48,15 @@ function UserInputNode({ data }) {
     }
   };
 
+  useEffect(() => {
+    console.log("userInputNode", !!openAIInstance);
+  }, [openAIInstance]);
+
   const placeHolderText = openAIInstance
     ? id === "3"
       ? `Enter to send
 Shift + Enter new line
-Scroll or drag to any direction
-Shift + Scroll to zoom
+Space + Scroll to zoom
 + button adds a new input node
 `
       : "Message ChatGPT..."
@@ -72,7 +73,7 @@ Shift + Scroll to zoom
       </div>
       <TextArea
         id={id}
-        disabled={openAIInstance == null}
+        disabled={!openAIInstance}
         label=""
         placeholder={placeHolderText}
         value={text}
@@ -106,6 +107,7 @@ UserInputNode.propTypes = {
     id: PropTypes.string,
     quantity: PropTypes.number,
   }),
+  id: PropTypes.string,
 };
 
 export default UserInputNode;

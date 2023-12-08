@@ -5,15 +5,21 @@ import ReactFlow, {
   Controls,
   Panel,
 } from "reactflow";
-import { storeManager } from "../../store";
+import { storeManager, useSelectedStoreId } from "../../store";
 import { FaGithub } from "react-icons/fa";
-
 import "reactflow/dist/style.css";
 
-import OpenAIConfigNode from "./openaiConfig";
+// import OpenAIConfigNode from "./openaiConfig";
+import ApiKeyNode from "./apiKey";
 import UserInputNode from "./userInput";
 import SystemMessageInput from "./systemMessageInput";
 import ChatOutputNode from "./chatOutput";
+import History from "../Common/history";
+
+const selectedSelector = (state) => ({
+  selectedStoreId: state.selectedStoreId,
+  setSelectedStoreId: state.setSelectedStoreId,
+});
 
 const selector = (state) => ({
   nodes: state.nodes,
@@ -28,25 +34,28 @@ const selector = (state) => ({
 
 function Flow() {
   const { fitView } = useReactFlow();
+  const { selectedStoreId, setSelectedStoreId } =
+    useSelectedStoreId(selectedSelector);
   const store = storeManager.getSelectedStore();
   const {
     nodes,
     edges,
+    apiKey,
     onNodesChange,
     onEdgesChange,
     deleteChatNode,
-    openAIConfig,
     createOpenAIInstance,
   } = store(selector, (state, next) => {
     return (
       state.nodes === next.nodes &&
       state.edges === next.edges &&
+      state.apiKey === next.apiKey &&
+      state.defaultTemperature === next.defaultTemperature &&
       state.onNodesChange === next.onNodesChange &&
       state.onEdgesChange === next.onEdgesChange &&
       state.onConnect === next.onConnect &&
       state.openAIConfig === next.openAIConfig &&
-      state.createOpenAIInstance === next.createOpenAIInstance &&
-      state.deleteChatNode === next.deleteChatNode
+      state.createOpenAIInstance === next.createOpenAIInstance
     );
   });
   const [currentNodeLength, setCurrentNodeLength] = useState(nodes.length);
@@ -75,13 +84,7 @@ function Flow() {
   }, [nodes]);
 
   useEffect(() => {
-    if (
-      !openAIConfig ||
-      !openAIConfig.apiKey ||
-      openAIConfig.apiKey.length === 0 ||
-      openAIConfig.engine.trim().length === 0
-    )
-      return;
+    if (!apiKey || apiKey.length === 0) return;
     async function createInstance() {
       await createOpenAIInstance();
     }
@@ -90,20 +93,29 @@ function Flow() {
 
   const nodeTypes = useMemo(
     () => ({
-      openAIConfig: OpenAIConfigNode,
+      // openAIConfig: OpenAIConfigNode,
       userInput: UserInputNode,
-      systemMessageInput: SystemMessageInput,
+      systemMessage: SystemMessageInput,
       chatOutput: ChatOutputNode,
+      apiKey: ApiKeyNode,
     }),
     []
   );
+
+  const updateScene = (id) => {
+    setSelectedStoreId(id);
+  };
+
+  const createNewChatPage = () => {
+    storeManager.createNewStore();
+  };
 
   const onNodesDelete = (nodesDeleted) => {
     deleteChatNode(nodesDeleted, nodes, edges);
   };
 
   return (
-    <div className="w-screen h-screen">
+    <div className="w-screen h-screen" key={selectedStoreId}>
       <ReactFlow
         panOnScroll
         onNodesDelete={onNodesDelete}
@@ -117,14 +129,36 @@ function Flow() {
         snapGrid={[15, 15]}
         minZoom={0.1}
         maxZoom={1}
-        zoomActivationKeyCode="Shift"
+        zoomActivationKeyCode="Space"
       >
-        <Panel position="top-left">
-          <div className="flex justify-center items-start space-y-2 w-full h-12 flex-col">
+        <Panel position="top-left opacity-50">
+          <div className="flex justify-center items-start space-y-2 w-full mb-2 flex-col hover:opacity-80 transition-opacity duration-300 ease-in-out">
+            <div
+              className="flex items-center cursor-pointer"
+              onClick={createNewChatPage}
+            >
+              <img
+                src={"./logo.png"}
+                alt="logo"
+                className="w-7 rounded-full  mr-2 -ml-1 bg-gray-600 p-1"
+              />
+              <p className="text-white">New chat +</p>
+            </div>
+          </div>
+          <History updateScene={updateScene} />
+        </Panel>
+
+        <Panel position="top-right opacity-50">
+          <div className="flex justify-center items-start space-y-2 w-full h-2 flex-col">
             <div className="flex items-center">
               <img src={"./logo.png"} alt="logo" className="w-6 mr-2 -ml-1" />
               <p className="text-white text-sm">ComfyChat</p>
             </div>
+          </div>
+        </Panel>
+
+        <Panel position="bottom-right">
+          <div className="flex justify-center items-start space-y-2 w-full h-1 flex-col">
             <a
               href="https://github.com/felri/ComfyChat"
               target="_blank"
@@ -143,7 +177,5 @@ function Flow() {
     </div>
   );
 }
-
-
 
 export default Flow;

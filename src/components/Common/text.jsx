@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import PropTypes from "prop-types";
 
 function TextInput({
@@ -10,9 +9,9 @@ function TextInput({
   name = "text",
   ...props
 }) {
-  const handleChange = useCallback((evt) => {
+  const handleChange = (evt) => {
     onChange(evt);
-  }, []);
+  };
 
   return (
     <div className="flex flex-col">

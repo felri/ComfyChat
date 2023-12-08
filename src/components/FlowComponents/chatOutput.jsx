@@ -6,24 +6,28 @@ import { HiOutlineTrash } from "react-icons/hi2";
 import hljs from "highlight.js";
 import { IoIosAdd } from "react-icons/io";
 import PropTypes from "prop-types";
+import { IoStopCircleOutline } from "react-icons/io5";
 
 import "highlight.js/styles/atom-one-dark.css"; // Or any other style you prefer
 
 function ChatOutputNode({ id, data }) {
   const containerRef = useRef(null);
   const store = storeManager.getSelectedStore();
+  const abortRef = useRef(false);
 
   const {
+    temperature,
+    textModel,
     openAIInstance,
-    openAIConfig,
     getHistory,
     updateChildrenPosition,
-    onUpdateUserInput,
+    onDataTextUpdate,
     deleteUserNode,
     createNewInputNode,
   } = store(useCallback((state) => state, []));
   const [streamContent, setStreamContent] = useState("");
   const [currentHeight, setCurrentHeight] = useState(520);
+  const [streaming, setStreaming] = useState(false);
 
   function escapeHtml(html) {
     return html
@@ -87,32 +91,50 @@ function ChatOutputNode({ id, data }) {
   useEffect(() => {
     async function fetchStreamData() {
       try {
-        if (!openAIInstance) return;
-        if (!openAIConfig || !openAIConfig.engine) return;
+        if (!openAIInstance) {
+          setStreamContent("Something went wrong, please check your API key");
+          return;
+        }
         const history = getHistory(data.id);
-        console.log("history", history);
+        setStreaming(true);
         const stream = await openAIInstance.chat.completions.create({
-          model: openAIConfig.engine,
-          temperature: Number(parseFloat(openAIConfig.temperature)),
+          model: textModel,
+          temperature: Number(parseFloat(temperature)),
           messages: history,
           stream: true,
         });
         let current = "";
         for await (const chunk of stream) {
+          if (abortRef.current) {
+            setStreaming(false);
+            break;
+          }
           let content = chunk.choices[0]?.delta?.content || "";
           setStreamContent((prevContent) => {
             current = prevContent + content;
             return prevContent + content;
           });
         }
-        onUpdateUserInput(current, data.id);
+        onDataTextUpdate(current, data.id);
       } catch (error) {
-        console.error("Error streaming data:", error);
+        if (error.name !== "AbortError") {
+          console.error("Error streaming data:", error);
+        }
       }
+      setStreaming(false);
+    }
+
+    if (data.text.trim().length) {
+      setStreamContent((prevContent) => prevContent + data.text);
+      return;
     }
 
     fetchStreamData();
   }, []);
+
+  const stopStreaming = () => {
+    abortRef.current = true;
+  };
 
   useEffect(() => {
     hljs.highlightAll();
@@ -134,11 +156,19 @@ function ChatOutputNode({ id, data }) {
       id={id}
     >
       <div className="absolute top-1 right-1 hover:cursor-pointer">
-        <HiOutlineTrash
-          opacity={0.7}
-          size={20}
-          onClick={() => deleteUserNode(id)}
-        />
+        {streaming ? (
+          <IoStopCircleOutline
+            size={25}
+            className="hover:cursor-pointer"
+            onClick={stopStreaming}
+          />
+        ) : (
+          <HiOutlineTrash
+            opacity={0.7}
+            size={20}
+            onClick={() => deleteUserNode(id)}
+          />
+        )}
       </div>
       <Handle type="source" position={Position.Bottom} />
       <Handle type="target" position={Position.Top} />

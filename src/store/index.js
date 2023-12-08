@@ -5,51 +5,31 @@ import {
   createInputBelowOutputNode,
   deleteOneNode,
   getMessageHistory,
-  createNewOutputNode,
-  defaultEdgeOptions,
+  createNewNode,
   generateStoreId,
+  getStoredStoreIds,
 } from "./utils";
 import OpenAI from "openai";
+import { initialLayouted } from "./constants";
+import {
+  visionModels,
+  textModels,
+  imageModels,
+  ttsModels,
+  sttModels,
+} from "./defaultModels";
 
-const initialNodes = [
-  {
-    id: "1",
-    type: "openAIConfig",
-    position: { x: -350, y: 275 },
-  },
-  {
-    id: "2",
-    type: "systemMessageInput",
-    data: { text: "", id: "2" },
-    position: { x: 0, y: 250 },
-  },
-  {
-    id: "3",
-    type: "userInput",
-    data: { text: "", id: "3", quantity: 1 },
-    position: { x: -100, y: 600 },
-  },
-];
-
-const initialEdges = [
-  {
-    id: "e1-2",
-    source: "1",
-    target: "2",
-    ...defaultEdgeOptions,
-  },
-  {
-    id: "e2-3",
-    source: "2",
-    target: "3",
-    ...defaultEdgeOptions,
-  },
-];
-
-const initialLayouted = {
-  nodes: initialNodes,
-  edges: initialEdges,
-};
+function createModelInstance(apiKey) {
+  try {
+    return new OpenAI({
+      apiKey: apiKey,
+      dangerouslyAllowBrowser: true,
+    });
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+}
 
 // Factory function to create a new store
 const createStore = (initialLayouted, id) =>
@@ -60,32 +40,30 @@ const createStore = (initialLayouted, id) =>
         nodes: initialLayouted.nodes,
         edges: initialLayouted.edges,
         openAIInstance: null,
-        openAIConfig: {
-          apiKey: "",
-          engine: "gpt-3.5-turbo-1106",
-          temperature: 0.9,
-          systemMessage: "You are a chatbot. You are talking to a human.",
-        },
-        updateOpenAIConfig: (newConfig) => {
+        apiKey: "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",
+        temperature: 0.9,
+        textModel: textModels[0],
+        visionModel: visionModels[0],
+        imageModel: imageModels[0],
+        TTSModel: ttsModels[0],
+        STTModel: sttModels[0],
+        updateStore: (name, value) => {
           set((state) => ({
-            openAIConfig: { ...state.openAIConfig, ...newConfig },
+            ...state,
+            [name]: value,
           }));
         },
         updateOpenAIKey: (newKey) => {
           set((state) => ({
-            openAIConfig: { ...state.openAIConfig, ...newKey },
-            openAIInstance: new OpenAI({
-              apiKey: newKey.apiKey,
-              dangerouslyAllowBrowser: true,
-            }),
+            ...state,
+            apiKey: newKey,
+            openAIInstance:
+              newKey.trim().length === 51 ? createModelInstance(newKey) : null,
           }));
         },
         createOpenAIInstance: () => {
           set((state) => ({
-            openAIInstance: new OpenAI({
-              apiKey: state.openAIConfig.apiKey,
-              dangerouslyAllowBrowser: true,
-            }),
+            openAIInstance: createModelInstance(state.apiKey),
           }));
         },
         onNodesChange: (changes) => {
@@ -103,7 +81,7 @@ const createStore = (initialLayouted, id) =>
             edges: addEdge(connection, get().edges),
           });
         },
-        onUpdateUserInput: (text, id) => {
+        onDataTextUpdate: (text, id) => {
           set((state) => ({
             nodes: state.nodes.map((node) => {
               if (node.id === id) {
@@ -129,29 +107,40 @@ const createStore = (initialLayouted, id) =>
             });
           });
         },
-        onUpdateUserQuantity: (quantity, id) => {
-          set((state) => ({
-            nodes: state.nodes.map((node) => {
-              if (node.id === id) {
-                return { ...node, data: { quantity } };
-              }
-              return node;
-            }),
-          }));
-        },
         getHistory: (id) => {
-          const sytemMessage = get().openAIConfig.systemMessage;
-          return getMessageHistory(id, sytemMessage, get().nodes, get().edges);
+          return getMessageHistory(id, get().nodes, get().edges);
+        },
+        onChooseType: (id, modelType) => {
+          const layouted = createNewNode(
+            get().nodes,
+            get().edges,
+            id,
+            250,
+            "systemMessage",
+            { modelType, text: "You are an AI Assistant talking with a human." }
+          );
+          const lastNode = layouted.nodes[layouted.nodes.length - 1];
+
+          // create a new input node and edge
+          const inputLayouted = createInputBelowOutputNode(
+            layouted.nodes,
+            layouted.edges,
+            lastNode.id
+          );
+
+          set({
+            nodes: inputLayouted.nodes,
+            edges: inputLayouted.edges,
+          });
         },
         onUserInputSend: (id, parentHeight) => {
           // create a new output node and edge
-          const layouted = createNewOutputNode(
+          const layouted = createNewNode(
             get().nodes,
             get().edges,
             id,
             parentHeight
           );
-
           const lastNode = layouted.nodes[layouted.nodes.length - 1];
 
           // create a new input node and edge
@@ -200,29 +189,57 @@ const createStore = (initialLayouted, id) =>
         partialize: (state) =>
           Object.fromEntries(
             Object.entries(state).filter(([key]) =>
-              ["openAIConfig", "id", "nodes", "edges"].includes(key)
+              [
+                "id",
+                "nodes",
+                "edges",
+                "apiKey",
+                "temperature",
+                "textModel",
+                "visionModel",
+                "imageModel",
+                "TTSModel",
+                "STTModel",
+              ].includes(key)
             )
           ),
       }
     )
   );
 
+const useSelectedStoreId = create(
+  persist(
+    (set) => ({
+      selectedStoreId: getStoredStoreIds()[0],
+      setSelectedStoreId: (id) => set({ selectedStoreId: id }),
+    }),
+    {
+      name: "selected-store-id",
+      partialize: (state) =>
+        Object.fromEntries(
+          Object.entries(state).filter(([key]) =>
+            ["selectedStoreId"].includes(key)
+          )
+        ),
+    }
+  )
+);
+
 const storeManager = {
   stores: {},
-  selectedStoreId: null,
 
   getSelectedStore() {
-    return this.stores[this.selectedStoreId];
+    return this.stores[useSelectedStoreId.getState().selectedStoreId];
   },
 
   setSelectedStore(id) {
-    this.selectedStoreId = id;
+    useSelectedStoreId.setState({ selectedStoreId: id });
   },
 
   initializeStores() {
-    const storeIds = this.getStoredStoreIds();
+    const storeIds = getStoredStoreIds();
     if (storeIds.length === 0) {
-      this.createNewStore(initialLayouted);
+      this.createNewStore();
       return;
     }
     storeIds.forEach((id) => {
@@ -230,11 +247,11 @@ const storeManager = {
     });
   },
 
-  createNewStore(initialLayouted) {
+  createNewStore() {
     const id = generateStoreId();
     const newStore = createStore(initialLayouted, id);
     this.stores[id] = newStore;
-    this.selectedStoreId = id;
+    useSelectedStoreId.setState({ selectedStoreId: id });
     return newStore;
   },
 
@@ -252,174 +269,8 @@ const storeManager = {
     delete this.stores[id];
     localStorage.removeItem(`store-${id}`); // Remove from local storage
   },
-
-  getStoredStoreIds() {
-    const storeIds = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith("store-")) {
-        const id = key.substring(6); // Extract ID part of the key
-        storeIds.push(id);
-      }
-    }
-    return storeIds;
-  },
 };
 
-// Initialize store manager when app starts
 storeManager.initializeStores();
 
-// const useStore = create(
-//   persist(
-//     (set, get) => ({
-//       nodes: initialLayouted.nodes,
-//       edges: initialLayouted.edges,
-//       openAIInstance: null,
-//       openAIConfig: {
-//         apiKey: "",
-//         engine: "gpt-3.5-turbo-1106",
-//         temperature: 0.9,
-//         systemMessage: "You are a chatbot. You are talking to a human.",
-//       },
-//       updateOpenAIConfig: (newConfig) => {
-//         set((state) => ({
-//           openAIConfig: { ...state.openAIConfig, ...newConfig },
-//         }));
-//       },
-//       updateOpenAIKey: (newKey) => {
-//         set((state) => ({
-//           openAIConfig: { ...state.openAIConfig, ...newKey },
-//           openAIInstance: new OpenAI({
-//             apiKey: newKey.apiKey,
-//             dangerouslyAllowBrowser: true,
-//           }),
-//         }));
-//       },
-//       createOpenAIInstance: () => {
-//         set((state) => ({
-//           openAIInstance: new OpenAI({
-//             apiKey: state.openAIConfig.apiKey,
-//             dangerouslyAllowBrowser: true,
-//           }),
-//         }));
-//       },
-//       onNodesChange: (changes) => {
-//         set({
-//           nodes: applyNodeChanges(changes, get().nodes),
-//         });
-//       },
-//       onEdgesChange: (changes) => {
-//         set({
-//           edges: applyEdgeChanges(changes, get().edges),
-//         });
-//       },
-//       onConnect: (connection) => {
-//         set({
-//           edges: addEdge(connection, get().edges),
-//         });
-//       },
-//       onUpdateUserInput: (text, id) => {
-//         set((state) => ({
-//           nodes: state.nodes.map((node) => {
-//             if (node.id === id) {
-//               return { ...node, data: { text } };
-//             }
-//             return node;
-//           }),
-//         }));
-//       },
-//       deleteUserNode: (id) => {
-//         const layouted = deleteOneNode(get().nodes, get().edges, id);
-//         set({
-//           nodes: layouted.nodes,
-//           edges: layouted.edges,
-//         });
-//       },
-//       deleteChatNode: (deletedNodes, nodes, edges) => {
-//         deletedNodes.forEach((node) => {
-//           const layouted = deleteOneNode(nodes, edges, node.id);
-//           set({
-//             nodes: layouted.nodes,
-//             edges: layouted.edges,
-//           });
-//         });
-//       },
-//       onUpdateUserQuantity: (quantity, id) => {
-//         set((state) => ({
-//           nodes: state.nodes.map((node) => {
-//             if (node.id === id) {
-//               return { ...node, data: { quantity } };
-//             }
-//             return node;
-//           }),
-//         }));
-//       },
-//       getHistory: (id) => {
-//         const sytemMessage = get().openAIConfig.systemMessage;
-//         return getMessageHistory(id, sytemMessage, get().nodes, get().edges);
-//       },
-//       onUserInputSend: (id, parentHeight) => {
-//         // create a new output node and edge
-//         const layouted = createNewOutputNode(
-//           get().nodes,
-//           get().edges,
-//           id,
-//           parentHeight
-//         );
-
-//         const lastNode = layouted.nodes[layouted.nodes.length - 1];
-
-//         // create a new input node and edge
-//         const inputLayouted = createInputBelowOutputNode(
-//           layouted.nodes,
-//           layouted.edges,
-//           lastNode.id
-//         );
-
-//         set({
-//           nodes: inputLayouted.nodes,
-//           edges: inputLayouted.edges,
-//         });
-//       },
-//       createNewInputNode: (id, parentHeigth) => {
-//         const layouted = createInputBelowOutputNode(
-//           get().nodes,
-//           get().edges,
-//           id,
-//           parentHeigth
-//         );
-
-//         set({
-//           nodes: layouted.nodes,
-//           edges: layouted.edges,
-//         });
-//       },
-//       updateChildrenPosition: (id, diff) => {
-//         const layouted = get().nodes.map((node) => {
-//           if (node.id === id) {
-//             return {
-//               ...node,
-//               position: {
-//                 x: node.position.x,
-//                 y: node.position.y + diff,
-//               },
-//             };
-//           }
-//           return node;
-//         });
-//         set({ nodes: layouted });
-//       },
-//     }),
-//     {
-//       name: "flow-editor",
-//       partialize: (state) =>
-//         Object.fromEntries(
-//           Object.entries(state).filter(([key]) =>
-//             ["openAIConfig"].includes(key)
-//           )
-//         ),
-//     }
-//   )
-// );
-
-export { storeManager };
+export { storeManager, useSelectedStoreId };
