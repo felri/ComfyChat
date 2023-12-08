@@ -30,6 +30,7 @@ const selector = (state) => ({
   openAIConfig: state.openAIConfig,
   createOpenAIInstance: state.createOpenAIInstance,
   deleteChatNode: state.deleteChatNode,
+  resetStore: state.resetStore,
 });
 
 function Flow() {
@@ -45,6 +46,7 @@ function Flow() {
     onEdgesChange,
     deleteChatNode,
     createOpenAIInstance,
+    resetStore,
   } = store(selector, (state, next) => {
     return (
       state.nodes === next.nodes &&
@@ -55,7 +57,9 @@ function Flow() {
       state.onEdgesChange === next.onEdgesChange &&
       state.onConnect === next.onConnect &&
       state.openAIConfig === next.openAIConfig &&
-      state.createOpenAIInstance === next.createOpenAIInstance
+      state.createOpenAIInstance === next.createOpenAIInstance &&
+      state.deleteChatNode === next.deleteChatNode &&
+      state.resetStore === next.resetStore
     );
   });
   const [currentNodeLength, setCurrentNodeLength] = useState(nodes.length);
@@ -145,7 +149,11 @@ function Flow() {
               <p className="text-white">New chat +</p>
             </div>
           </div>
-          <History updateScene={updateScene} />
+          <History
+            updateScene={updateScene}
+            currentId={selectedStoreId}
+            resetStore={resetStore}
+          />
         </Panel>
 
         <Panel position="top-right opacity-50">

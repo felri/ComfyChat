@@ -47,6 +47,13 @@ const createStore = (initialLayouted, id) =>
         imageModel: imageModels[0],
         TTSModel: ttsModels[0],
         STTModel: sttModels[0],
+        resetStore: () => {
+          set((state) => ({
+            ...state,
+            nodes: initialLayouted.nodes,
+            edges: initialLayouted.edges,
+          }));
+        },
         updateStore: (name, value) => {
           set((state) => ({
             ...state,
@@ -267,7 +274,10 @@ const storeManager = {
 
   removeStore(id) {
     delete this.stores[id];
-    localStorage.removeItem(`store-${id}`); // Remove from local storage
+    localStorage.removeItem(`store-${id}`);
+    if (Object.keys(this.stores).length === 0) {
+      this.createNewStore();
+    }
   },
 };
 
