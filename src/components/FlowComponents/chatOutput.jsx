@@ -2,11 +2,13 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { storeManager } from "../../store";
 import { Handle, Position } from "reactflow";
 import Container from "../Common/container";
+import TextArea from "../Common/textarea";
 import { HiOutlineTrash } from "react-icons/hi2";
 import hljs from "highlight.js";
 import { IoIosAdd } from "react-icons/io";
 import PropTypes from "prop-types";
 import { IoStopCircleOutline } from "react-icons/io5";
+import { FaEdit, FaSave } from "react-icons/fa";
 
 import "highlight.js/styles/atom-one-dark.css"; // Or any other style you prefer
 
@@ -28,6 +30,7 @@ function ChatOutputNode({ id, data }) {
   const [streamContent, setStreamContent] = useState("");
   const [currentHeight, setCurrentHeight] = useState(520);
   const [streaming, setStreaming] = useState(false);
+  const [editing, setEditing] = useState(false);
 
   function escapeHtml(html) {
     return html
@@ -95,7 +98,7 @@ function ChatOutputNode({ id, data }) {
           setStreamContent("Something went wrong, please check your API key");
           return;
         }
-        const history = getHistory(data.id);
+        const history = getHistory(id);
         setStreaming(true);
         const stream = await openAIInstance.chat.completions.create({
           model: textModel,
@@ -115,7 +118,7 @@ function ChatOutputNode({ id, data }) {
             return prevContent + content;
           });
         }
-        onDataTextUpdate(current, data.id);
+        onDataTextUpdate(current, id);
       } catch (error) {
         if (error.name !== "AbortError") {
           console.error("Error streaming data:", error);
@@ -124,7 +127,7 @@ function ChatOutputNode({ id, data }) {
       setStreaming(false);
     }
 
-    if (data.text.trim().length) {
+    if (data.text.trim().length && streamContent.trim().length === 0) {
       setStreamContent((prevContent) => prevContent + data.text);
       return;
     }
@@ -132,13 +135,16 @@ function ChatOutputNode({ id, data }) {
     fetchStreamData();
   }, []);
 
+  useEffect(() => {
+    hljs.highlightAll();
+  }, [streaming, editing, streamContent]);
+
   const stopStreaming = () => {
     abortRef.current = true;
   };
 
   useEffect(() => {
-    hljs.highlightAll();
-    let childId = parseInt(data.id) + 1;
+    let childId = parseInt(id) + 1;
     childId = childId.toString();
     const height = containerRef.current?.offsetHeight || 0;
     if (height > currentHeight) {
@@ -148,11 +154,16 @@ function ChatOutputNode({ id, data }) {
     }
   }, [streamContent]);
 
+  const handleEditSave = () => {
+    setEditing(false);
+    onDataTextUpdate(streamContent, id);
+  };
+
   return (
     <Container
       innerRef={containerRef}
       title="Output"
-      className="w-[750px] min-h-[520px] overflow-y-scroll flex items-left justify-start overflow-hidden pb-10"
+      className="w-[750px] min-h-[520px] overflow-y-scroll flex items-left justify-start overflow-hidden pb-10 relative"
       id={id}
     >
       <div className="absolute top-1 right-1 hover:cursor-pointer">
@@ -172,10 +183,40 @@ function ChatOutputNode({ id, data }) {
       </div>
       <Handle type="source" position={Position.Bottom} />
       <Handle type="target" position={Position.Top} />
-      <div
-        dangerouslySetInnerHTML={{ __html: formatStreamContent(streamContent) }}
-        className=" w-full h-full"
-      />
+      <div className="flex items-center justify-end absolute top-1 left-1 cursor-pointer">
+        {editing ? (
+          <FaSave
+            size={20}
+            className="hover:cursor-pointer"
+            onClick={handleEditSave}
+          />
+        ) : (
+          <FaEdit
+            size={20}
+            className="hover:cursor-pointer"
+            onClick={() => setEditing(true)}
+          />
+        )}
+      </div>
+
+      {editing ? (
+        <TextArea
+          id={id}
+          label=""
+          value={streamContent}
+          cols={65}
+          name="text"
+          onChange={(evt) => setStreamContent(evt.target.value)}
+          autoFocus
+        />
+      ) : (
+        <div
+          dangerouslySetInnerHTML={{
+            __html: formatStreamContent(streamContent),
+          }}
+          className="w-full h-full"
+        />
+      )}
       <div className="flex justify-end items-center absolute bottom-0 right-0 w-full h-10 cursor-pointer">
         <IoIosAdd
           size={30}

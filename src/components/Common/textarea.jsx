@@ -32,7 +32,7 @@ function TextArea({
         autoFocus={autoFocus}
         onChange={handleChange}
         minRows={7}
-        className="overflow-y-auto nograg"
+        className="nodrag w-full h-full overflow-y-auto"
         value={value}
         name={name}
         placeholder={placeholder}
@@ -51,6 +51,7 @@ TextArea.propTypes = {
   placeholder: PropTypes.string,
   name: PropTypes.string,
   autoFocus: PropTypes.bool,
+  className: PropTypes.string,
 };
 
 export default TextArea;

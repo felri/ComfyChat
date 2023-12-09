@@ -63,7 +63,7 @@ Space + Scroll to zoom
     : "Please add an API key";
 
   return (
-    <Container title="Input" innerRef={nodeRef} id={id}>
+    <Container title="Input" innerRef={nodeRef} id={id} className="w-[750px]">
       <div className="absolute top-1 right-1 hover:cursor-pointer">
         <HiOutlineTrash
           opacity={0.7}

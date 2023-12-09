@@ -55,7 +55,7 @@ function SystemMessageNode({ id, data }) {
   );
 
   return (
-    <Container title="System Message" className="pb-10" id="2">
+    <Container title="System Message" className="pb-10 w-[600px]" id="2">
       <Dropdown
         label="Model"
         name="type"

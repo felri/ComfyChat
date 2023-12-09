@@ -59,13 +59,17 @@ function History({ updateScene, currentId, resetStore }) {
   };
 
   const onDelete = (id) => {
+    console.log("onDelete", id);
+    console.log("currentId", currentId);
+    console.log("history", history);
     if (id === currentId) {
-      if (history.length > 1) {
-        updateScene(history[0]);
+      if (history.length > 1) {  
+        storeManager.removeStore(id);
+        const first = getStoredStoreIds()[0];
+        updateScene(first);
       } else {
         resetStore();
       }
-      storeManager.removeStore(id);
     } else {
       storeManager.removeStore(id);
     }
