@@ -68,6 +68,15 @@ function ApiKeyNode({ id }) {
 
   const onChange = (e) => {
     setApiKey(e.target.value);
+    if (e.target.value.length === 0) {
+      store((state) => {
+        state.openAIInstance = null;
+      });
+    }
+
+    if (e.target.value.length > 0) {
+      createOpenAIInstance();
+    }
   };
 
   useEffect(() => {
