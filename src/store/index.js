@@ -246,7 +246,7 @@ const storeManager = {
       return;
     }
     storeIds.forEach((id) => {
-      this.stores[id] = createStore({}, id);
+      this.stores[id] = createStore(id);
     });
   },
 
