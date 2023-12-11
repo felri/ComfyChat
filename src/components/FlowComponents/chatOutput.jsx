@@ -179,7 +179,7 @@ function ChatOutputNode({ id, data }) {
     <Container
       innerRef={containerRef}
       title="Output"
-      className="w-[750px] min-h-[520px] overflow-y-scroll flex items-left justify-start overflow-hidden pb-10 relative"
+      className="w-[800px] min-h-[520px] overflow-y-scroll flex items-left justify-start overflow-hidden pb-10 relative"
       id={id}
     >
       <div className="absolute top-1 right-1 hover:cursor-pointer">

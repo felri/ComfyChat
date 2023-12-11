@@ -58,7 +58,7 @@ export function createInputBelowOutputNode(
   const height = parentHeight || 560;
 
   const newNodePosition = {
-    x: parentNode.position.x + 800 * numberOfChildren.length,
+    x: parentNode.position.x + 850 * numberOfChildren.length,
     y: parentNode.position.y + height + 25,
   };
 
