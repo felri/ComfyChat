@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import ReactFlow, { useReactFlow, Background, Panel } from "reactflow";
 import { storeManager, useConfigStore } from "../../store";
 import { FaGithub } from "react-icons/fa";
@@ -28,8 +28,15 @@ const selector = (state) => ({
   resetStore: state.resetStore,
 });
 
+const nodeTypes = {
+  userInput: UserInputNode,
+  systemMessage: SystemMessageInput,
+  chatOutput: ChatOutputNode,
+  apiKey: ApiKeyNode,
+};
+
 function Flow() {
-  const { fitView } = useReactFlow();
+  const { fitView, setViewport, getViewport } = useReactFlow();
   const { apiKey, createOpenAIInstance, openAIInstance } = useConfigStore(
     (state) => state
   );
@@ -61,24 +68,13 @@ function Flow() {
 
   useEffect(() => {
     if (nodes.length === currentNodeLength) return;
-
-    if (nodes.length < currentNodeLength) {
-      const lastNodes = nodes.slice(-3);
-      fitView({
-        nodes: lastNodes,
-        duration: 500,
-      });
-      setCurrentNodeLength(nodes.length);
-      return;
-    }
-
+    const sliceSize = nodes.length < currentNodeLength ? -3 : -2;
     setCurrentNodeLength(nodes.length);
-    const lastTwoNodes = nodes.slice(-2);
     fitView({
-      nodes: lastTwoNodes,
+      nodes: nodes.slice(sliceSize),
       duration: 500,
     });
-  }, [nodes]);
+  }, [nodes, currentNodeLength, fitView]);
 
   useEffect(() => {
     if (!apiKey || apiKey.length === 0 || !selectedStoreId || !!openAIInstance)
@@ -87,17 +83,7 @@ function Flow() {
       await createOpenAIInstance(apiKey);
     }
     createInstance();
-  }, [selectedStoreId]);
-
-  const nodeTypes = useMemo(
-    () => ({
-      userInput: UserInputNode,
-      systemMessage: SystemMessageInput,
-      chatOutput: ChatOutputNode,
-      apiKey: ApiKeyNode,
-    }),
-    []
-  );
+  }, [apiKey, createOpenAIInstance, openAIInstance, selectedStoreId]);
 
   const updateScene = (id) => {
     setSelectedStoreId(id);
@@ -111,28 +97,42 @@ function Flow() {
     deleteChatNode(nodesDeleted, nodes, edges);
   };
 
+  const handleKeyPress = useCallback(
+    (e) => {
+      if (e.ctrlKey && e.code === "Space") {
+        const lastNode = nodes[nodes.length - 1]; // Assuming the last node is at the end of the array
+
+        console.log(lastNode);
+        // Calculate the bottom Y of the last node
+        const nodeBottom = lastNode.position.y + lastNode.height;
+        const x = window.innerWidth / 2 - lastNode.width;
+
+        // Get the current viewport
+        const viewport = getViewport();
+
+        // Calculate the height of the viewport in flow coordinates
+        const viewportHeightInFlowCoords = window.innerHeight;
+
+        // Calculate the desired new Y position of the viewport
+        // This will align the bottom of the viewport with the bottom of the last node
+        const newY = viewportHeightInFlowCoords - nodeBottom;
+
+        // Apply the adjustment if there is a significant change
+        if (Math.abs(viewport.y - newY) > 1) {
+          setViewport({ x, y: newY, zoom: 1 }, { duration: 200 });
+        }
+      }
+    },
+    [getViewport, nodes, setViewport]
+  );
+
   // listen for keypresses control + space and focus one the last node
   useEffect(() => {
-    const handleKeyPress = (e) => {
-      if (e.ctrlKey && e.code === "Space") {
-        console.log(e.code);
-
-        const lastNode = nodes[nodes.length - 1];
-        console.log(lastNode);
-        if (!lastNode) return;
-        fitView({
-          nodes: [lastNode],
-          duration: 300,
-          zoom: 1,
-        });
-      }
-    };
-
     window.addEventListener("keydown", handleKeyPress);
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
     };
-  }, []);
+  }, [handleKeyPress]);
 
   return (
     <div className="w-screen h-screen" key={selectedStoreId}>

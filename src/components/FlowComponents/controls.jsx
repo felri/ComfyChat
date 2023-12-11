@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useReactFlow } from "reactflow";
 import { CiSquarePlus, CiSquareMinus } from "react-icons/ci";
 import { TbFocus2 } from "react-icons/tb";
@@ -9,6 +10,20 @@ import PropTypes from "prop-types";
 function Controls({ resetStore }) {
   const { fitView, zoomIn, zoomOut } = useReactFlow();
 
+  const handleZoomIn = useCallback(() => {
+    zoomIn();
+  }, [zoomIn]);
+
+  const handleZoomOut = useCallback(() => {
+    zoomOut();
+  }, [zoomOut]);
+
+  const handleFitView = useCallback(() => {
+    fitView({
+      duration: 500,
+    });
+  }, [fitView]);
+
   return (
     <div className="p-1 cursor-pointer flex items-center justify-center">
       <Tooltip text="Delete all nodes">
@@ -19,18 +34,14 @@ function Controls({ resetStore }) {
         />
       </Tooltip>
       <Tooltip text="Zoom in" className="mr-4">
-        <CiSquarePlus onClick={zoomIn} size={35} />
+        <CiSquarePlus onClick={handleZoomIn} size={35} />
       </Tooltip>
       <Tooltip text="Zoom out" className="mr-4">
-        <CiSquareMinus onClick={zoomOut} size={35} />
+        <CiSquareMinus onClick={handleZoomOut} size={35} />
       </Tooltip>
       <Tooltip text="Fit view">
         <TbFocus2
-          onClick={() =>
-            fitView({
-              duration: 500,
-            })
-          }
+          onClick={handleFitView}
           size={35}
         />
       </Tooltip>
