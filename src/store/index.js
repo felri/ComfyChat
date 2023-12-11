@@ -36,42 +36,20 @@ const createStore = (initialLayouted, id) =>
   create(
     persist(
       (set, get) => ({
-        id, // unique identifier for each store
+        id,
         nodes: initialLayouted.nodes,
         edges: initialLayouted.edges,
-        openAIInstance: null,
-        apiKey: "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",
         temperature: 0.9,
-        textModel: textModels[0],
-        visionModel: visionModels[0],
-        imageModel: imageModels[0],
-        TTSModel: ttsModels[0],
-        STTModel: sttModels[0],
         resetStore: () => {
-          set((state) => ({
-            ...state,
+          set({
             nodes: initialLayouted.nodes,
             edges: initialLayouted.edges,
-          }));
+          });
         },
         updateStore: (name, value) => {
-          set((state) => ({
-            ...state,
+          set({
             [name]: value,
-          }));
-        },
-        updateOpenAIKey: (newKey) => {
-          set((state) => ({
-            ...state,
-            apiKey: newKey,
-            openAIInstance:
-              newKey.trim().length === 51 ? createModelInstance(newKey) : null,
-          }));
-        },
-        createOpenAIInstance: () => {
-          set((state) => ({
-            openAIInstance: createModelInstance(state.apiKey),
-          }));
+          });
         },
         onNodesChange: (changes) => {
           set({
@@ -192,40 +170,58 @@ const createStore = (initialLayouted, id) =>
         },
       }),
       {
-        name: `store-${id}`, // unique key for local storage persistence
+        name: `store-${id}`,
         partialize: (state) =>
           Object.fromEntries(
             Object.entries(state).filter(([key]) =>
-              [
-                "id",
-                "nodes",
-                "edges",
-                "apiKey",
-                "temperature",
-                "textModel",
-                "visionModel",
-                "imageModel",
-                "TTSModel",
-                "STTModel",
-              ].includes(key)
+              ["id", "nodes", "edges", "temperature"].includes(key)
             )
           ),
       }
     )
   );
 
-const useSelectedStoreId = create(
+const useConfigStore = create(
   persist(
     (set) => ({
       selectedStoreId: getStoredStoreIds()[0],
+      apiKey: "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",
+      openAIInstance: null,
+      lockViewInOutput: false,
+      textModel: textModels[0],
+      visionModel: visionModels[0],
+      imageModel: imageModels[0],
+      TTSModel: ttsModels[0],
+      STTModel: sttModels[0],
       setSelectedStoreId: (id) => set({ selectedStoreId: id }),
+      setApiKey: (key) => set({ apiKey: key }),
+      setLockViewInOutput: (lock) => set({ lockViewInOutput: lock }),
+      updateStore: (name, value) => {
+        set({
+          [name]: value,
+        });
+      },
+      createOpenAIInstance: () => {
+        set((state) => ({
+          openAIInstance: createModelInstance(state.apiKey),
+        }));
+      },
     }),
     {
-      name: "selected-store-id",
+      name: "config-store",
       partialize: (state) =>
         Object.fromEntries(
           Object.entries(state).filter(([key]) =>
-            ["selectedStoreId"].includes(key)
+            [
+              "selectedStoreId",
+              "apiKey",
+              "lockViewInOutput",
+              "textModel",
+              "visionModel",
+              "imageModel",
+              "TTSModel",
+              "STTModel",
+            ].includes(key)
           )
         ),
     }
@@ -236,11 +232,11 @@ const storeManager = {
   stores: {},
 
   getSelectedStore() {
-    return this.stores[useSelectedStoreId.getState().selectedStoreId];
+    return this.stores[useConfigStore.getState().selectedStoreId];
   },
 
   setSelectedStore(id) {
-    useSelectedStoreId.setState({ selectedStoreId: id });
+    useConfigStore.setState({ selectedStoreId: id });
   },
 
   initializeStores() {
@@ -258,7 +254,7 @@ const storeManager = {
     const id = generateStoreId();
     const newStore = createStore(initialLayouted, id);
     this.stores[id] = newStore;
-    useSelectedStoreId.setState({ selectedStoreId: id });
+    useConfigStore.setState({ selectedStoreId: id });
     return newStore;
   },
 
@@ -283,4 +279,4 @@ const storeManager = {
 
 storeManager.initializeStores();
 
-export { storeManager, useSelectedStoreId };
+export { storeManager, useConfigStore };

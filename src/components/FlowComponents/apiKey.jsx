@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { storeManager } from "../../store";
+import { storeManager, useConfigStore } from "../../store";
 import { Handle, Position } from "reactflow";
 import Container from "../Common/container";
 import TextInput from "../Common/text";
@@ -16,26 +16,26 @@ const buttons = [
     label: "Chat",
     type: "text",
   },
-  {
-    icon: <FaEye size={20} />,
-    label: "Vision",
-    type: "vision",
-  },
-  {
-    icon: <CiImageOn size={20} />,
-    label: "Create Image",
-    type: "image",
-  },
-  {
-    icon: <BsSoundwave size={20} />,
-    label: "Speech to Text",
-    type: "stt",
-  },
-  {
-    icon: <AiOutlineSound size={20} />,
-    label: "Text to Speech",
-    type: "tts",
-  },
+  // {
+  //   icon: <FaEye size={20} />,
+  //   label: "Vision",
+  //   type: "vision",
+  // },
+  // {
+  //   icon: <CiImageOn size={20} />,
+  //   label: "Create Image",
+  //   type: "image",
+  // },
+  // {
+  //   icon: <BsSoundwave size={20} />,
+  //   label: "Speech to Text",
+  //   type: "stt",
+  // },
+  // {
+  //   icon: <AiOutlineSound size={20} />,
+  //   label: "Text to Speech",
+  //   type: "tts",
+  // },
 ];
 
 function IconButton({ icon, onClick, label, type, disabled }) {
@@ -61,12 +61,13 @@ IconButton.propTypes = {
 
 function ApiKeyNode({ id }) {
   const store = storeManager.getSelectedStore();
-  const { apiKey, updateOpenAIKey, onChooseType, createOpenAIInstance } = store(
+  const { apiKey, setApiKey, createOpenAIInstance } = useConfigStore((state) => state);
+  const { onChooseType } = store(
     (state) => state
   );
 
   const onChange = (e) => {
-    updateOpenAIKey(e.target.value);
+    setApiKey(e.target.value);
   };
 
   useEffect(() => {

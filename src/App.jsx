@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import Scene from "./components/FlowComponents/scene";
 import { ReactFlowProvider } from "reactflow";
 import hljs from "highlight.js/lib/core";

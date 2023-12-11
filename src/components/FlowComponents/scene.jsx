@@ -1,18 +1,13 @@
 import { useState, useMemo, useEffect } from "react";
-import ReactFlow, {
-  useReactFlow,
-  Background,
-  Controls,
-  Panel,
-} from "reactflow";
-import { storeManager, useSelectedStoreId } from "../../store";
+import ReactFlow, { useReactFlow, Background, Panel } from "reactflow";
+import { storeManager, useConfigStore } from "../../store";
 import { FaGithub } from "react-icons/fa";
 import "reactflow/dist/style.css";
 
-// import OpenAIConfigNode from "./openaiConfig";
 import ApiKeyNode from "./apiKey";
 import UserInputNode from "./userInput";
 import SystemMessageInput from "./systemMessageInput";
+import Controls from "./controls";
 import ChatOutputNode from "./chatOutput";
 import History from "../Common/history";
 
@@ -35,23 +30,23 @@ const selector = (state) => ({
 
 function Flow() {
   const { fitView } = useReactFlow();
+  const { apiKey, createOpenAIInstance, openAIInstance } = useConfigStore(
+    (state) => state
+  );
   const { selectedStoreId, setSelectedStoreId } =
-    useSelectedStoreId(selectedSelector);
+    useConfigStore(selectedSelector);
   const store = storeManager.getSelectedStore();
   const {
     nodes,
     edges,
-    apiKey,
     onNodesChange,
     onEdgesChange,
     deleteChatNode,
-    createOpenAIInstance,
     resetStore,
   } = store(selector, (state, next) => {
     return (
       state.nodes === next.nodes &&
       state.edges === next.edges &&
-      state.apiKey === next.apiKey &&
       state.defaultTemperature === next.defaultTemperature &&
       state.onNodesChange === next.onNodesChange &&
       state.onEdgesChange === next.onEdgesChange &&
@@ -64,15 +59,13 @@ function Flow() {
   });
   const [currentNodeLength, setCurrentNodeLength] = useState(nodes.length);
 
-  // fitview when nodes change
   useEffect(() => {
     if (nodes.length === currentNodeLength) return;
 
-    // if less than previous, fitview last three nodes
     if (nodes.length < currentNodeLength) {
-      const lastThreeNodes = nodes.slice(-3);
+      const lastNodes = nodes.slice(-3);
       fitView({
-        nodes: lastThreeNodes,
+        nodes: lastNodes,
         duration: 500,
       });
       setCurrentNodeLength(nodes.length);
@@ -88,16 +81,18 @@ function Flow() {
   }, [nodes]);
 
   useEffect(() => {
-    if (!apiKey || apiKey.length === 0) return;
+    if (!apiKey || apiKey.length === 0 || !selectedStoreId || !!openAIInstance)
+      return;
+
+    console.log("creating instance");
     async function createInstance() {
-      await createOpenAIInstance();
+      await createOpenAIInstance(apiKey);
     }
     createInstance();
-  }, []);
+  }, [selectedStoreId]);
 
   const nodeTypes = useMemo(
     () => ({
-      // openAIConfig: OpenAIConfigNode,
       userInput: UserInputNode,
       systemMessage: SystemMessageInput,
       chatOutput: ChatOutputNode,
@@ -132,13 +127,13 @@ function Flow() {
         snapToGrid
         snapGrid={[15, 15]}
         minZoom={0.1}
-        maxZoom={1}
+        maxZoom={1.2}
         zoomActivationKeyCode="Space"
       >
         <Panel position="top-left opacity-50">
           <div className="flex justify-center items-start space-y-2 w-full mb-2 flex-col hover:opacity-80 transition-opacity duration-300 ease-in-out">
             <div
-              className="flex items-center cursor-pointer"
+              className="flex items-center cursor-pointer font-bold"
               onClick={createNewChatPage}
             >
               <img
@@ -180,7 +175,9 @@ function Flow() {
         </Panel>
 
         <Background />
-        <Controls />
+        <Panel position="bottom-left">
+          <Controls />
+        </Panel>
       </ReactFlow>
     </div>
   );

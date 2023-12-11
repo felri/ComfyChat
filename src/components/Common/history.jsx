@@ -26,11 +26,12 @@ const Item = ({ id, updateScene, selected, onDelete }) => {
   return (
     <div
       className={`cursor-pointer p-2 border-b border-gray-700 hover:opacity-80 transition-opacity duration-300 ease-in-out flex justify-between items-center ${
-        selected ? "bg-gray-700" : ""
+        selected ? "bg-gray-900" : ""
       }`}
       onClick={() => updateScene(id)}
     >
       <div className="text-white">{formatId(id)}</div>
+      {!selected && (
         <HiOutlineTrash
           className="text-white ml-2"
           size={18}
@@ -39,6 +40,7 @@ const Item = ({ id, updateScene, selected, onDelete }) => {
             onDelete(id);
           }}
         />
+      )}
     </div>
   );
 };
@@ -59,11 +61,8 @@ function History({ updateScene, currentId, resetStore }) {
   };
 
   const onDelete = (id) => {
-    console.log("onDelete", id);
-    console.log("currentId", currentId);
-    console.log("history", history);
     if (id === currentId) {
-      if (history.length > 1) {  
+      if (history.length > 1) {
         storeManager.removeStore(id);
         const first = getStoredStoreIds()[0];
         updateScene(first);
@@ -74,10 +73,10 @@ function History({ updateScene, currentId, resetStore }) {
       storeManager.removeStore(id);
     }
     setHistory(getStoredStoreIds());
-  }
+  };
 
   return (
-    <div className="text-white">
+    <div className="text-white font-bold">
       <div
         className="flex items-center cursor-pointer w-full justify-start hover:opacity-80 transition-opacity duration-300 ease-in-out py-1"
         onClick={toggleDropdown}
@@ -85,9 +84,9 @@ function History({ updateScene, currentId, resetStore }) {
         <BsChatSquareDots className="text-gray-200 mr-3" size={21} />
         <div className="">History</div>
         {isOpen ? (
-          <IoIosArrowUp className="text-white" />
+          <IoIosArrowUp className="ml-2 mt-1 text-white" />
         ) : (
-          <IoIosArrowDown className="text-white" />
+          <IoIosArrowDown className=" ml-2 mt-1 text-white" />
         )}
       </div>
 

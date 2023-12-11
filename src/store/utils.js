@@ -92,6 +92,14 @@ export function getStoredStoreIds() {
       storeIds.push(id);
     }
   }
+
+  // Sort the storeIds based on the Unix timestamp
+  storeIds.sort((a, b) => {
+    const timestampA = parseInt(a.split("-")[0], 10); // Extract and parse timestamp from ID
+    const timestampB = parseInt(b.split("-")[0], 10);
+    return  timestampB - timestampA;
+  });
+
   return storeIds;
 }
 

@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { storeManager } from "../../store";
+import { storeManager, useConfigStore } from "../../store";
 import { Handle, Position } from "reactflow";
+import { useReactFlow } from "reactflow";
 import Container from "../Common/container";
 import TextArea from "../Common/textarea";
 import { HiOutlineTrash } from "react-icons/hi2";
@@ -10,17 +11,23 @@ import PropTypes from "prop-types";
 import { IoStopCircleOutline } from "react-icons/io5";
 import { FaEdit, FaSave } from "react-icons/fa";
 
-import "highlight.js/styles/atom-one-dark.css"; // Or any other style you prefer
+import "highlight.js/styles/github-dark.css"; // Or any other style you prefer
 
 function ChatOutputNode({ id, data }) {
   const containerRef = useRef(null);
   const store = storeManager.getSelectedStore();
   const abortRef = useRef(false);
 
+  const { lockViewInOutput, textModel, openAIInstance } = useConfigStore(
+    (state) => ({
+      lockViewInOutput: state.lockViewInOutput,
+      textModel: state.textModel,
+      openAIInstance: state.openAIInstance,
+    })
+  );
+
   const {
     temperature,
-    textModel,
-    openAIInstance,
     getHistory,
     updateChildrenPosition,
     onDataTextUpdate,
@@ -31,6 +38,7 @@ function ChatOutputNode({ id, data }) {
   const [currentHeight, setCurrentHeight] = useState(520);
   const [streaming, setStreaming] = useState(false);
   const [editing, setEditing] = useState(false);
+  const { setViewport, getViewport } = useReactFlow();
 
   function escapeHtml(html) {
     return html
@@ -64,7 +72,7 @@ function ChatOutputNode({ id, data }) {
       if (line.startsWith(backticks)) {
         if (inCodeBlock) {
           // End of a code block
-          formattedText += `<pre><code class="${language} chatoutput nodrag">${escapeHtml(
+          formattedText += `<div class="p-1 px-2 bg-black rounded-t flex items-center justify-start text-white">${language}</div><pre><code class="${language} chatoutput nodrag">${escapeHtml(
             codeContent
           )}</code></pre>\n`;
           inCodeBlock = false;
@@ -150,7 +158,19 @@ function ChatOutputNode({ id, data }) {
     if (height > currentHeight) {
       const diff = height - currentHeight;
       setCurrentHeight(height);
-      updateChildrenPosition(childId, diff);
+      if (streaming) {
+        updateChildrenPosition(childId, diff);
+        if (lockViewInOutput) {
+          // Get the current viewport position
+          const viewport = getViewport();
+
+          // Modify the y position to account for the height difference
+          const newY = viewport.y - diff / viewport.zoom;
+
+          // Set the modified viewport
+          setViewport({ ...viewport, y: newY }, { duration: 200 });
+        }
+      }
     }
   }, [streamContent]);
 

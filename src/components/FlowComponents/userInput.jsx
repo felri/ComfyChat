@@ -1,7 +1,7 @@
 // a flow node component that is used as a text input, it uses the textInput component
 
 import { useCallback, useState, useRef, useEffect } from "react";
-import { storeManager } from "../../store";
+import { storeManager, useConfigStore } from "../../store";
 import { Handle, Position } from "reactflow";
 import Container from "../Common/container";
 import TextArea from "../Common/textarea";
@@ -12,8 +12,10 @@ import PropTypes from "prop-types";
 function UserInputNode({ id, data }) {
   const nodeRef = useRef(null);
   const store = storeManager.getSelectedStore();
-  const { onDataTextUpdate, onUserInputSend, openAIInstance, deleteUserNode } =
-    store(useCallback((state) => state, []));
+  const [openAIInstance] = useConfigStore((state) => [state.openAIInstance]);
+  const { onDataTextUpdate, onUserInputSend, deleteUserNode } = store(
+    useCallback((state) => state, [])
+  );
 
   const [text, setText] = useState(data.text);
   const [wordCount, setWordCount] = useState(0);
@@ -47,10 +49,6 @@ function UserInputNode({ id, data }) {
       onUserInputSend(id, height);
     }
   };
-
-  useEffect(() => {
-    console.log("userInputNode", !!openAIInstance);
-  }, [openAIInstance]);
 
   const placeHolderText = openAIInstance
     ? id === "3"
