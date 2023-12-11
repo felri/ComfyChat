@@ -57,7 +57,7 @@ function Flow() {
       state.resetStore === next.resetStore
     );
   });
-  const [currentNodeLength, setCurrentNodeLength] = useState(nodes.length);
+  const [currentNodeLength, setCurrentNodeLength] = useState(nodes?.length);
 
   useEffect(() => {
     if (nodes.length === currentNodeLength) return;
@@ -83,8 +83,6 @@ function Flow() {
   useEffect(() => {
     if (!apiKey || apiKey.length === 0 || !selectedStoreId || !!openAIInstance)
       return;
-
-    console.log("creating instance");
     async function createInstance() {
       await createOpenAIInstance(apiKey);
     }
@@ -112,6 +110,29 @@ function Flow() {
   const onNodesDelete = (nodesDeleted) => {
     deleteChatNode(nodesDeleted, nodes, edges);
   };
+
+  // listen for keypresses control + space and focus one the last node
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.ctrlKey && e.code === "Space") {
+        console.log(e.code);
+
+        const lastNode = nodes[nodes.length - 1];
+        console.log(lastNode);
+        if (!lastNode) return;
+        fitView({
+          nodes: [lastNode],
+          duration: 300,
+          zoom: 1,
+        });
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress);
+    };
+  }, []);
 
   return (
     <div className="w-screen h-screen" key={selectedStoreId}>
@@ -176,7 +197,7 @@ function Flow() {
 
         <Background />
         <Panel position="bottom-left">
-          <Controls />
+          <Controls resetStore={resetStore} />
         </Panel>
       </ReactFlow>
     </div>

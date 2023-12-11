@@ -161,14 +161,10 @@ function ChatOutputNode({ id, data }) {
       if (streaming) {
         updateChildrenPosition(childId, diff);
         if (lockViewInOutput) {
-          // Get the current viewport position
           const viewport = getViewport();
-
           // Modify the y position to account for the height difference
-          const newY = viewport.y - diff / viewport.zoom;
-
-          // Set the modified viewport
-          setViewport({ ...viewport, y: newY }, { duration: 200 });
+          const newY = viewport.y - (diff * 1.5);
+          setViewport({ ...viewport, y: newY }, { duration: 100 });
         }
       }
     }

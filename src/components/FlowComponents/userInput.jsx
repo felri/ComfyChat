@@ -55,6 +55,7 @@ function UserInputNode({ id, data }) {
       ? `Enter to send
 Shift + Enter new line
 Space + Scroll to zoom
+Control + Space to center
 + button adds a new input node
 `
       : "Message ChatGPT..."
@@ -80,7 +81,7 @@ Space + Scroll to zoom
         name="text"
         onChange={onChange}
         onKeyDown={onEnter}
-        autoFocus
+        autoFocus={true}
       />
       <Handle type="source" position={Position.Bottom} />
       <Handle type="target" position={Position.Top} />

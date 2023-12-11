@@ -32,18 +32,18 @@ function createModelInstance(apiKey) {
 }
 
 // Factory function to create a new store
-const createStore = (initialLayouted, id) =>
+const createStore = (id) =>
   create(
     persist(
       (set, get) => ({
         id,
-        nodes: initialLayouted.nodes,
-        edges: initialLayouted.edges,
+        nodes: [...initialLayouted.nodes],
+        edges: [...initialLayouted.edges],
         temperature: 0.9,
         resetStore: () => {
           set({
-            nodes: initialLayouted.nodes,
-            edges: initialLayouted.edges,
+            nodes: [...initialLayouted.nodes],
+            edges: [...initialLayouted.edges],
           });
         },
         updateStore: (name, value) => {
@@ -114,8 +114,8 @@ const createStore = (initialLayouted, id) =>
           );
 
           set({
-            nodes: inputLayouted.nodes,
-            edges: inputLayouted.edges,
+            nodes: [...inputLayouted.nodes],
+            edges: [...inputLayouted.edges],
           });
         },
         onUserInputSend: (id, parentHeight) => {
@@ -136,8 +136,8 @@ const createStore = (initialLayouted, id) =>
           );
 
           set({
-            nodes: inputLayouted.nodes,
-            edges: inputLayouted.edges,
+            nodes: [...inputLayouted.nodes],
+            edges: [...inputLayouted.edges],
           });
         },
         createNewInputNode: (id, parentHeigth) => {
@@ -185,9 +185,9 @@ const useConfigStore = create(
   persist(
     (set) => ({
       selectedStoreId: getStoredStoreIds()[0],
-      apiKey: "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",
+      apiKey: "",
       openAIInstance: null,
-      lockViewInOutput: false,
+      lockViewInOutput: true,
       textModel: textModels[0],
       visionModel: visionModels[0],
       imageModel: imageModels[0],
@@ -252,7 +252,7 @@ const storeManager = {
 
   createNewStore() {
     const id = generateStoreId();
-    const newStore = createStore(initialLayouted, id);
+    const newStore = createStore(id);
     this.stores[id] = newStore;
     useConfigStore.setState({ selectedStoreId: id });
     return newStore;

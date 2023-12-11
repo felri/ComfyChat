@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { storeManager } from "../../store";
+import { storeManager, useConfigStore } from "../../store";
 import { Handle, Position } from "reactflow";
 import Container from "../Common/container";
 import TextArea from "../Common/textarea";
@@ -33,16 +33,58 @@ function selectModel(type) {
   }
 }
 
+function getModelType(type) {
+  switch (type) {
+    case "text":
+      return "textModel";
+    case "vision":
+      return "visionModel";
+    case "image":
+      return "imageModel";
+    case "tts":
+      return "TTSModel";
+    case "stt":
+      return "STTModel";
+    default:
+      return "textModel";
+  }
+}
+
 function SystemMessageNode({ id, data }) {
   const store = storeManager.getSelectedStore();
   const dropdownData = selectModel(data.type);
+  const {
+    updateStore,
+    textModel,
+    visionModel,
+    imageModel,
+    TTSModel,
+    STTModel,
+  } = useConfigStore((state) => state);
+  const { temperature, createNewInputNode, onDataTextUpdate } = store(
+    useCallback((state) => state, [])
+  );
 
-  const { updateStore, temperature, createNewInputNode, onDataTextUpdate } =
-    store(useCallback((state) => state, []));
+  const defaultDropdownValue = () => {
+    switch (data.type) {
+      case "text":
+        return textModel;
+      case "vision":
+        return visionModel;
+      case "image":
+        return imageModel;
+      case "tts":
+        return TTSModel;
+      case "stt":
+        return STTModel;
+      default:
+        return textModel;
+    }
+  };
 
   const onChange = useCallback(
     (e) => {
-      updateStore(e.target.name, e.target.value);
+      updateStore(getModelType(data.type), e.target.value);
     },
     [updateStore]
   );
@@ -60,7 +102,7 @@ function SystemMessageNode({ id, data }) {
         label="Model"
         name="type"
         onChange={onChange}
-        value={data.type}
+        value={defaultDropdownValue()}
         options={dropdownData}
       />
       <div className="h-1" />

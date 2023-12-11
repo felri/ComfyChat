@@ -1,4 +1,3 @@
-
 export const defaultEdgeOptions = {
   animated: false,
   type: "smoothstep",
@@ -40,6 +39,6 @@ export const initialEdges = [
 ];
 
 export const initialLayouted = {
-  nodes: initialNodes,
-  edges: initialEdges,
+  nodes: [...initialNodes],
+  edges: [...initialEdges],
 };
