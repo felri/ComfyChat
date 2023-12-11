@@ -100,26 +100,30 @@ function Flow() {
   const handleKeyPress = useCallback(
     (e) => {
       if (e.ctrlKey && e.code === "Space") {
-        const lastNode = nodes[nodes.length - 1]; // Assuming the last node is at the end of the array
+        const lastNode = nodes[nodes.length - 1];
+        // Calculate the center X position of the last node
+        const nodeCenterX = lastNode.position.x + lastNode.width / 2;
 
-        console.log(lastNode);
+        // Calculate the desired new X position of the viewport
+        // This will align the center of the viewport with the center of the last node
+        const newX = window.innerWidth / 2 - nodeCenterX;
+
         // Calculate the bottom Y of the last node
         const nodeBottom = lastNode.position.y + lastNode.height;
-        const x = window.innerWidth / 2 - lastNode.width;
 
         // Get the current viewport
         const viewport = getViewport();
 
-        // Calculate the height of the viewport in flow coordinates
-        const viewportHeightInFlowCoords = window.innerHeight;
-
         // Calculate the desired new Y position of the viewport
         // This will align the bottom of the viewport with the bottom of the last node
-        const newY = viewportHeightInFlowCoords - nodeBottom;
+        const newY = window.innerHeight - nodeBottom;
 
         // Apply the adjustment if there is a significant change
-        if (Math.abs(viewport.y - newY) > 1) {
-          setViewport({ x, y: newY, zoom: 1 }, { duration: 200 });
+        if (
+          Math.abs(viewport.x - newX) > 1 ||
+          Math.abs(viewport.y - newY) > 1
+        ) {
+          setViewport({ x: newX, y: newY, zoom: 1 }, { duration: 200 });
         }
       }
     },
