@@ -60,47 +60,6 @@ export function getModelNameFromType(type) {
   }
 }
 
-export function createInputBelowOutputNode(
-  nodes,
-  edges,
-  parentId,
-  parentHeight,
-  nodeType = "text"
-) {
-  const parentNode = nodes.find((node) => node.id === parentId);
-  if (!parentNode) {
-    throw new Error("Parent node not found");
-  }
-
-  const numberOfChildren = edges.filter((edge) => edge.source === parentId);
-  const height = parentHeight || 560;
-
-  const newNodePosition = {
-    x: parentNode.position.x + 900 * numberOfChildren.length,
-    y: parentNode.position.y + height + 75,
-  };
-
-  const newNodeId = `${parseInt(nodes[nodes.length - 1].id) + 1}`;
-  const newNode = {
-    id: newNodeId,
-    type: nodeType,
-    data: { text: "", id: newNodeId },
-    position: newNodePosition,
-  };
-
-  const newEdge = {
-    id: `e${parentId}-${newNodeId}`,
-    source: parentId,
-    target: newNodeId,
-    ...defaultEdgeOptions,
-  };
-
-  return {
-    nodes: [...nodes, newNode],
-    edges: [...edges, newEdge],
-  };
-}
-
 export function getStoredStoreIds() {
   const storeIds = [];
   for (let i = 0; i < localStorage.length; i++) {
@@ -165,7 +124,7 @@ export function getMessageHistory(id, nodes, edges) {
 
 export function calculateNewNodePosition(nodes, edges, parentId, parentHeight) {
   const horizontalOffset = 900; // Horizontal offset for each child
-  const verticalSpacing = 100; // Vertical spacing from the parent node
+  const verticalSpacing = 150; // Vertical spacing from the parent node
 
   // Find the parent node
   let parentNode = nodes.find((node) => node.id === parentId);

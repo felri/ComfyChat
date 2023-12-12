@@ -28,7 +28,9 @@ function Dropzone({ id, disable }) {
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
-    accept: "audio/*",
+    accept: {
+      "audio/*": ["mp3", "wav", "ogg"],
+    },
     multiple: true,
   });
 
@@ -36,14 +38,14 @@ function Dropzone({ id, disable }) {
     <Container title="Input" innerRef={nodeRef} id={id} className="w-[500px]">
       <div
         {...getRootProps()}
-        className="flex items-center justify-center h-full w-full border-dashed	rounded border-2 border-gray-400 hover:bg-gray-800 py-4 px-12  cursor-pointer text-center whitespace-nowrap"
+        className="mt-4 flex items-center justify-center h-full w-full border-dashed	rounded border-2 border-gray-400 hover:bg-gray-800 py-4 px-12  cursor-pointer text-center whitespace-nowrap"
       >
         <Handle type="source" position={Position.Bottom} />
         <Handle type="target" position={Position.Top} />
 
         <input {...getInputProps()} disabled={disable} />
         <FaFileAudio size={20} className="mr-2" />
-        <span className="text-xs mr-3">Drop audio file here</span>
+        <span className="text-xs mr-3">Drop audio files here</span>
       </div>
     </Container>
   );

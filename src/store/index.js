@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { addEdge, applyNodeChanges, applyEdgeChanges } from "reactflow";
 import { persist } from "zustand/middleware";
 import {
-  createInputBelowOutputNode,
   deleteOneNode,
   getMessageHistory,
   createNewNode,
@@ -107,7 +106,7 @@ const createStore = (id) =>
           const lastNode = layouted.nodes[layouted.nodes.length - 1];
 
           // create a new input node and edge
-          const inputLayouted = createInputBelowOutputNode(
+          const inputLayouted = createNewNode(
             layouted.nodes,
             layouted.edges,
             lastNode.id,
@@ -161,11 +160,12 @@ const createStore = (id) =>
           });
         },
         createNewInputNode: (id, parentHeigth) => {
-          const layouted = createInputBelowOutputNode(
+          const layouted = createNewNode(
             get().nodes,
             get().edges,
             id,
-            parentHeigth
+            parentHeigth,
+            "text"
           );
 
           set({
@@ -200,10 +200,10 @@ const createStore = (id) =>
           const lastNode = layouted.nodes[layouted.nodes.length - 1];
 
           // create a new input node and edge
-          const inputLayouted = createInputBelowOutputNode(
+          const inputLayouted = createNewNode(
             layouted.nodes,
             layouted.edges,
-            lastNode.id
+            lastNode.id,
           );
 
           set({
