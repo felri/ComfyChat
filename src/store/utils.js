@@ -43,11 +43,29 @@ export function deleteOneNode(nodes, edges, nodeId) {
   }
 }
 
+export function getModelNameFromType(type) {
+  switch (type) {
+    case "chat":
+      return "davinci";
+    case "search":
+      return "davinci";
+    case "answers":
+      return "curie";
+    case "classification":
+      return "curie";
+    case "translation":
+      return "curie";
+    default:
+      return "davinci";
+  }
+}
+
 export function createInputBelowOutputNode(
   nodes,
   edges,
   parentId,
-  parentHeight
+  parentHeight,
+  nodeType = "text"
 ) {
   const parentNode = nodes.find((node) => node.id === parentId);
   if (!parentNode) {
@@ -58,14 +76,14 @@ export function createInputBelowOutputNode(
   const height = parentHeight || 560;
 
   const newNodePosition = {
-    x: parentNode.position.x + 850 * numberOfChildren.length,
-    y: parentNode.position.y + height + 25,
+    x: parentNode.position.x + 900 * numberOfChildren.length,
+    y: parentNode.position.y + height + 75,
   };
 
   const newNodeId = `${parseInt(nodes[nodes.length - 1].id) + 1}`;
   const newNode = {
     id: newNodeId,
-    type: "userInput",
+    type: nodeType,
     data: { text: "", id: newNodeId },
     position: newNodePosition,
   };
@@ -97,7 +115,7 @@ export function getStoredStoreIds() {
   storeIds.sort((a, b) => {
     const timestampA = parseInt(a.split("-")[0], 10); // Extract and parse timestamp from ID
     const timestampB = parseInt(b.split("-")[0], 10);
-    return  timestampB - timestampA;
+    return timestampB - timestampA;
   });
 
   return storeIds;
@@ -120,7 +138,9 @@ export function getMessageHistory(id, nodes, edges) {
       } else if (currentNode.data?.text) {
         // Prepend user or assistant messages to the history array.
         history.unshift({
-          role: currentNode.type === "userInput" ? "user" : "assistant",
+          role: currentNode.type.toLowerCase().includes("output")
+            ? "assistant"
+            : "user",
           content: currentNode.data.text,
         });
       }
@@ -144,7 +164,7 @@ export function getMessageHistory(id, nodes, edges) {
 }
 
 export function calculateNewNodePosition(nodes, edges, parentId, parentHeight) {
-  const horizontalOffset = 850; // Horizontal offset for each child
+  const horizontalOffset = 900; // Horizontal offset for each child
   const verticalSpacing = 100; // Vertical spacing from the parent node
 
   // Find the parent node

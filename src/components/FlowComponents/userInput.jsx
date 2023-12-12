@@ -1,5 +1,3 @@
-// a flow node component that is used as a text input, it uses the textInput component
-
 import { useCallback, useState, useRef, useEffect } from "react";
 import { storeManager, useConfigStore } from "../../store";
 import { Handle, Position } from "reactflow";
@@ -56,7 +54,9 @@ function UserInputNode({ id, data }) {
 Shift + Enter new line
 Space + Scroll to zoom
 Control + Space to center
-+ button adds a new input node
+Shift + Drag to select
+Backspace to delete selected
+Shift + N to create new chat
 `
       : "Message ChatGPT..."
     : "Please add an API key";
@@ -86,15 +86,20 @@ Control + Space to center
       <Handle type="source" position={Position.Bottom} />
       <Handle type="target" position={Position.Top} />
 
-      <div className="flex w-full justify-end pt-4 items-center space-x-2">
-        <p className="text-gray-500 text-sm mr-2">Word Count: {wordCount}</p>
+      <div className="flex items-center justify-center w-full">
+        <div className="flex w-full justify-end pt-4 items-center space-x-2">
+          <p className="text-gray-500 text-sm mr-2">Word Count: {wordCount}</p>
 
-        <IoMdSend
-          className="text-2xl text-gray-500 cursor-pointer"
-          onClick={() =>
-            onUserInputSend(id, nodeRef?.current?.getBoundingClientRect().width)
-          }
-        />
+          <IoMdSend
+            className="text-2xl text-gray-500 cursor-pointer"
+            onClick={() =>
+              onUserInputSend(
+                id,
+                nodeRef?.current?.getBoundingClientRect().width
+              )
+            }
+          />
+        </div>
       </div>
     </Container>
   );

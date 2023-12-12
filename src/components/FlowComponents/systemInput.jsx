@@ -61,7 +61,7 @@ function SystemMessageNode({ id, data }) {
     TTSModel,
     STTModel,
   } = useConfigStore((state) => state);
-  const { createNewInputNode, onDataTextUpdate, temperature, updateStore: updateStoreNode  } = store(
+  const { createNewInputNode, onDataTextUpdate, temperature, updateStore: updateStoreNode, createNewSTTNode  } = store(
     useCallback((state) => state, [])
   );
 
@@ -103,6 +103,23 @@ function SystemMessageNode({ id, data }) {
     [onDataTextUpdate, id]
   );
 
+  const createNewNode = useCallback(
+    (type) => {
+      switch (type) {
+        case "text":
+          createNewInputNode("2");
+          break;
+        case "stt":
+          createNewSTTNode("2");
+          break;
+        default:
+          createNewInputNode("2");
+          break;
+      }
+    },
+    [createNewInputNode]
+  );
+
   return (
     <Container title="System Message" className="pb-10 w-[600px]" id="2">
       <Dropdown
@@ -135,7 +152,7 @@ function SystemMessageNode({ id, data }) {
         name="temperature"
         type="number"
         min="0"
-        max="1"
+        max="2"
       />
       <TextArea
         placeholder="Enter your message and examples here"
@@ -152,7 +169,7 @@ function SystemMessageNode({ id, data }) {
         <IoIosAdd
           size={30}
           className="hover:cursor-pointer"
-          onClick={() => createNewInputNode("2")}
+          onClick={createNewNode}
         />
       </div>
     </Container>

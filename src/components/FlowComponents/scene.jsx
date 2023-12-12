@@ -9,6 +9,7 @@ import { FaGithub } from "react-icons/fa";
 import ApiKeyNode from "./apiKey";
 import UserInputNode from "./userInput";
 import SystemMessageInput from "./systemInput.jsx";
+import DropFilesNode from "./dropFiles";
 import Controls from "./controls";
 import ChatOutputNode from "./chatOutput";
 import History from "../Common/history";
@@ -31,10 +32,11 @@ const selector = (state) => ({
 });
 
 const nodeTypes = {
-  userInput: UserInputNode,
+  text: UserInputNode,
   systemMessage: SystemMessageInput,
   chatOutput: ChatOutputNode,
   apiKey: ApiKeyNode,
+  stt: DropFilesNode,
 };
 
 function Flow() {
@@ -128,6 +130,11 @@ function Flow() {
           setViewport({ x: newX, y: newY, zoom: 1 }, { duration: 200 });
         }
       }
+      // create new chat page
+      // control + shift + n
+      if (e.shiftKey && e.code === "KeyN") {
+        createNewChatPage();
+      }
     },
     [getViewport, nodes, setViewport]
   );
@@ -154,7 +161,7 @@ function Flow() {
         snapToGrid
         snapGrid={[15, 15]}
         minZoom={0.1}
-        maxZoom={1.2}
+        maxZoom={1}
         zoomActivationKeyCode="Space"
       >
         <Panel position="top-left" className="cursor-pointer">

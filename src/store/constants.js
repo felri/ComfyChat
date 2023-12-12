@@ -17,7 +17,7 @@ export const initialNodes = [
   // },
   // {
   //   id: "3",
-  //   type: "userInput",
+  //   type: "text",
   //   data: { text: "", id: "3", quantity: 1 },
   //   position: { x: -100, y: 600 },
   // },

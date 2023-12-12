@@ -95,14 +95,14 @@ const createStore = (id) =>
         getHistory: (id) => {
           return getMessageHistory(id, get().nodes, get().edges);
         },
-        onChooseType: (id, modelType) => {
+        onChooseType: (id, type, parentHeight = 250) => {
           const layouted = createNewNode(
             get().nodes,
             get().edges,
             id,
             250,
             "systemMessage",
-            { modelType, text: "You are an AI Assistant talking with a human." }
+            { text: "You are an AI Assistant talking with a human.", type }
           );
           const lastNode = layouted.nodes[layouted.nodes.length - 1];
 
@@ -110,7 +110,10 @@ const createStore = (id) =>
           const inputLayouted = createInputBelowOutputNode(
             layouted.nodes,
             layouted.edges,
-            lastNode.id
+            lastNode.id,
+            parentHeight,
+            type,
+            { type }
           );
 
           set({
@@ -129,15 +132,32 @@ const createStore = (id) =>
           const lastNode = layouted.nodes[layouted.nodes.length - 1];
 
           // create a new input node and edge
-          const inputLayouted = createInputBelowOutputNode(
+          const inputLayouted = createNewNode(
             layouted.nodes,
             layouted.edges,
-            lastNode.id
+            lastNode.id,
+            parentHeight + 125,
+            "text"
           );
 
           set({
             nodes: [...inputLayouted.nodes],
             edges: [...inputLayouted.edges],
+          });
+        },
+        createNewSTTNode: (id, parentHeight) => {
+          const layouted = createNewNode(
+            get().nodes,
+            get().edges,
+            id,
+            parentHeight,
+            "stt",
+            { modelType: "stt" }
+          );
+
+          set({
+            nodes: [...layouted.nodes],
+            edges: [...layouted.edges],
           });
         },
         createNewInputNode: (id, parentHeigth) => {
@@ -168,6 +188,29 @@ const createStore = (id) =>
           });
           set({ nodes: layouted });
         },
+        onAudioDrop: (id, file, parentHeight) => {
+          const layouted = createNewNode(
+            get().nodes,
+            get().edges,
+            id,
+            parentHeight,
+            "audioEditor",
+            { modelType: "stt", file }
+          );
+          const lastNode = layouted.nodes[layouted.nodes.length - 1];
+
+          // create a new input node and edge
+          const inputLayouted = createInputBelowOutputNode(
+            layouted.nodes,
+            layouted.edges,
+            lastNode.id
+          );
+
+          set({
+            nodes: [...inputLayouted.nodes],
+            edges: [...inputLayouted.edges],
+          });
+        }
       }),
       {
         name: `store-${id}`,
