@@ -163,7 +163,7 @@ function ChatOutputNode({ id, data }) {
         if (lockViewInOutput) {
           const viewport = getViewport();
           // Modify the y position to account for the height difference
-          const newY = viewport.y - (diff * 1.5);
+          const newY = viewport.y - (diff * 1.2);
           setViewport({ ...viewport, y: newY }, { duration: 100 });
         }
       }

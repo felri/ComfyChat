@@ -1,12 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
 import ReactFlow, { useReactFlow, Background, Panel } from "reactflow";
 import { storeManager, useConfigStore } from "../../store";
-import { FaGithub } from "react-icons/fa";
+import { HiOutlineTrash } from "react-icons/hi2";
 import "reactflow/dist/style.css";
-
+import Tooltip from "../Common/tooltip";
+import { CiFileOn } from "react-icons/ci";
+import { FaGithub } from "react-icons/fa";
 import ApiKeyNode from "./apiKey";
 import UserInputNode from "./userInput";
-import SystemMessageInput from "./systemMessageInput";
+import SystemMessageInput from "./systemInput.jsx";
 import Controls from "./controls";
 import ChatOutputNode from "./chatOutput";
 import History from "../Common/history";
@@ -155,20 +157,14 @@ function Flow() {
         maxZoom={1.2}
         zoomActivationKeyCode="Space"
       >
-        <Panel position="top-left opacity-50">
-          <div className="flex justify-center items-start space-y-2 w-full mb-2 flex-col hover:opacity-80 transition-opacity duration-300 ease-in-out">
-            <div
-              className="flex items-center cursor-pointer font-bold"
+        <Panel position="top-left" className="cursor-pointer">
+          <Tooltip text="New chat">
+            <CiFileOn
               onClick={createNewChatPage}
-            >
-              <img
-                src={"./logo.png"}
-                alt="logo"
-                className="w-7 rounded-full  mr-2 -ml-1 bg-gray-600 p-1"
-              />
-              <p className="text-white">New chat +</p>
-            </div>
-          </div>
+              size={35}
+              className="mb-1 hover:text-red-500 transition-colors duration-300 ease-in-out"
+            />
+          </Tooltip>
           <History
             updateScene={updateScene}
             currentId={selectedStoreId}
@@ -176,17 +172,13 @@ function Flow() {
           />
         </Panel>
 
-        <Panel position="top-right opacity-50">
-          <div className="flex justify-center items-start space-y-2 w-full h-2 flex-col">
+        <Panel position="top-right">
+          <div className="flex items-center space-y-3 w-full flex-col justify-end">
             <div className="flex items-center">
               <img src={"./logo.png"} alt="logo" className="w-6 mr-2 -ml-1" />
               <p className="text-white text-sm">ComfyChat</p>
             </div>
-          </div>
-        </Panel>
-
-        <Panel position="bottom-right">
-          <div className="flex justify-center items-start space-y-2 w-full h-1 flex-col">
+            <div className="flex justify-center items-start space-y-2 w-full h-1 flex-col">
             <a
               href="https://github.com/felri/ComfyChat"
               target="_blank"
@@ -197,6 +189,17 @@ function Flow() {
               <p className="text-white text-sm hover:underline">Github</p>
             </a>
           </div>
+          </div>
+        </Panel>
+
+        <Panel position="bottom-right" className="cursor-pointer">
+          <Tooltip text="Delete all nodes" position="right-full">
+            <HiOutlineTrash
+              onClick={resetStore}
+              size={35}
+              className="hover:text-red-500 transition-colors duration-300 ease-in-out"
+            />
+          </Tooltip>
         </Panel>
 
         <Background />

@@ -11,7 +11,7 @@ export const initialNodes = [
   },
   // {
   //   id: "2",
-  //   type: "systemMessageInput",
+  //   type: "systemInput.jsx",
   //   data: { text: "You are a chatbot. You are talking to a human.", id: "2" },
   //   position: { x: 0, y: 250 },
   // },

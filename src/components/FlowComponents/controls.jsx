@@ -1,13 +1,10 @@
 import { useCallback } from "react";
 import { useReactFlow } from "reactflow";
-import { CiSquarePlus, CiSquareMinus } from "react-icons/ci";
-import { TbFocus2 } from "react-icons/tb";
-import { HiOutlineTrash } from "react-icons/hi2";
-import LockView from "./lockView";
+import { CiSquarePlus, CiSquareMinus, CiMonitor } from "react-icons/ci";
+import LockView from "../Common/lockView";
 import Tooltip from "../Common/tooltip";
-import PropTypes from "prop-types";
 
-function Controls({ resetStore }) {
+function Controls() {
   const { fitView, zoomIn, zoomOut } = useReactFlow();
 
   const handleZoomIn = useCallback(() => {
@@ -25,14 +22,7 @@ function Controls({ resetStore }) {
   }, [fitView]);
 
   return (
-    <div className="p-1 cursor-pointer flex items-center justify-center">
-      <Tooltip text="Delete all nodes">
-        <HiOutlineTrash
-          onClick={resetStore}
-          size={35}
-          className="mr-4 hover:text-red-500 transition-colors duration-300 ease-in-out"
-        />
-      </Tooltip>
+    <div className="p-1 cursor-pointer flex items-center justify-center flex-col">
       <Tooltip text="Zoom in" className="mr-4">
         <CiSquarePlus onClick={handleZoomIn} size={35} />
       </Tooltip>
@@ -40,20 +30,16 @@ function Controls({ resetStore }) {
         <CiSquareMinus onClick={handleZoomOut} size={35} />
       </Tooltip>
       <Tooltip text="Fit view">
-        <TbFocus2
+        <CiMonitor
           onClick={handleFitView}
           size={35}
         />
       </Tooltip>
-      <Tooltip text="Lock view in output">
+      <Tooltip text="Lock scroll in output">
         <LockView />
       </Tooltip>
     </div>
   );
 }
-
-Controls.propTypes = {
-  resetStore: PropTypes.func.isRequired,
-};
 
 export default Controls;

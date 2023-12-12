@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { BsChatSquareDots } from "react-icons/bs";
-import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import PropTypes from "prop-types";
 import { getStoredStoreIds } from "../../store/utils";
 import { HiOutlineTrash } from "react-icons/hi2";
 import { storeManager } from "../../store";
+import Tooltip from "../Common/tooltip";
 
 const Item = ({ id, updateScene, selected, onDelete }) => {
   const formatId = (id) => {
@@ -78,16 +78,12 @@ function History({ updateScene, currentId, resetStore }) {
   return (
     <div className="text-white font-bold">
       <div
-        className="flex items-center cursor-pointer w-full justify-start hover:opacity-80 transition-opacity duration-300 ease-in-out py-1"
+        className="ml-1 mt-1 flex items-center cursor-pointer w-full justify-start hover:opacity-80 transition-opacity duration-300 ease-in-out py-1"
         onClick={toggleDropdown}
       >
-        <BsChatSquareDots className="text-gray-200 mr-3" size={21} />
-        <div className="">History</div>
-        {isOpen ? (
-          <IoIosArrowUp className="ml-2 mt-1 text-white" />
-        ) : (
-          <IoIosArrowDown className=" ml-2 mt-1 text-white" />
-        )}
+        <Tooltip text="History">
+          <BsChatSquareDots className="text-gray-200 mr-3" size={25} />
+        </Tooltip>
       </div>
 
       {isOpen && (

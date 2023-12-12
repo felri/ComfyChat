@@ -1,7 +1,7 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 
-const Tooltip = ({ children, text }) => {
+const Tooltip = ({ children, text, position = "left-full"}) => {
   const [showTooltip, setShowTooltip] = useState(false);
 
   return (
@@ -13,7 +13,7 @@ const Tooltip = ({ children, text }) => {
         {children}
       </div>
       {showTooltip && (
-        <div className="absolute bottom-full mb-2 px-2 py-1 bg-gray-700 text-white text-sm rounded-md">
+        <div className={`absolute mb-2 px-2 py-1 bg-gray-700 text-white text-sm rounded-md ${position}`}>
           {text}
         </div>
       )}
@@ -24,6 +24,7 @@ const Tooltip = ({ children, text }) => {
 Tooltip.propTypes = {
   children: PropTypes.node,
   text: PropTypes.string,
+  position: PropTypes.string,
 };
 
 export default Tooltip;
