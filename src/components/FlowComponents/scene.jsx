@@ -11,6 +11,7 @@ import UserInputNode from "./userInput";
 import SystemMessageInput from "./systemInput.jsx";
 import DropFilesNode from "./dropFiles";
 import Controls from "./controls";
+import AudioEditorNode from "./audioEditor";
 import ChatOutputNode from "./chatOutput";
 import History from "../Common/history";
 
@@ -29,6 +30,7 @@ const selector = (state) => ({
   createOpenAIInstance: state.createOpenAIInstance,
   deleteChatNode: state.deleteChatNode,
   resetStore: state.resetStore,
+  cleanEmptyEdges: state.cleanEmptyEdges,
 });
 
 const nodeTypes = {
@@ -37,6 +39,7 @@ const nodeTypes = {
   chatOutput: ChatOutputNode,
   apiKey: ApiKeyNode,
   stt: DropFilesNode,
+  audioEditor: AudioEditorNode,
 };
 
 function Flow() {
@@ -53,6 +56,7 @@ function Flow() {
     onNodesChange,
     onEdgesChange,
     deleteChatNode,
+    cleanEmptyEdges,
     resetStore,
   } = store(selector, (state, next) => {
     return (
@@ -65,10 +69,15 @@ function Flow() {
       state.openAIConfig === next.openAIConfig &&
       state.createOpenAIInstance === next.createOpenAIInstance &&
       state.deleteChatNode === next.deleteChatNode &&
-      state.resetStore === next.resetStore
+      state.resetStore === next.resetStore &&
+      state.cleanEmptyEdges === next.cleanEmptyEdges
     );
   });
   const [currentNodeLength, setCurrentNodeLength] = useState(nodes?.length);
+
+  useEffect(() => {
+    cleanEmptyEdges();
+  }, [cleanEmptyEdges]);
 
   useEffect(() => {
     if (nodes.length === currentNodeLength) return;

@@ -10,6 +10,7 @@ function Container({
   id,
 }) {
   const [selectedNodes, setSelectedNodes] = useState([]);
+  
   useOnSelectionChange({
     onChange: ({ nodes }) => {
       setSelectedNodes(nodes.map((node) => node.id));

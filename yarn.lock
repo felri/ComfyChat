@@ -2848,6 +2848,16 @@ vite@^5.0.0:
   optionalDependencies:
     fsevents "~2.3.3"
 
+wavesurfer-react@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/wavesurfer-react/-/wavesurfer-react-3.0.1.tgz#bd15c3026f8339ee6c0cc63b09eb525d8a404e2d"
+  integrity sha512-J5lPkaPEcigK5zwIuZSNiHLQavi5W9n0kp9AwCSmq9JtICk6utYXVFjk1OpEkAytgyaZI0rCVg/Mbp6hti9uMw==
+
+wavesurfer.js@^7.5.2:
+  version "7.5.2"
+  resolved "https://registry.yarnpkg.com/wavesurfer.js/-/wavesurfer.js-7.5.2.tgz#8f03124531ba1e6b022df85a0cc358747aa8317d"
+  integrity sha512-hgO8p0MXxJ6oLm367jsjujve6QNEqt1B+T7muvXtMWWDn08efZ2DrVw6xaUI9NiX3Lo7BNYu9lPKnE5jubjoOg==
+
 web-streams-polyfill@4.0.0-beta.3:
   version "4.0.0-beta.3"
   resolved "https://registry.yarnpkg.com/web-streams-polyfill/-/web-streams-polyfill-4.0.0-beta.3.tgz#2898486b74f5156095e473efe989dcf185047a38"

@@ -30,6 +30,17 @@ function createModelInstance(apiKey) {
   }
 }
 
+const useFileStore = create((set) => ({
+  files: [],
+  setFiles: (files) => set({ files }),
+  addFile: (file) => set((state) => ({ files: [...state.files, file] })),
+  removeFile: (file) =>
+    set((state) => ({
+      files: state.files.filter((f) => f.name !== file.name),
+    })),
+  removeAllFiles: () => set({ files: [] }),
+}));
+
 // Factory function to create a new store
 const createStore = (id) =>
   create(
@@ -93,6 +104,19 @@ const createStore = (id) =>
         },
         getHistory: (id) => {
           return getMessageHistory(id, get().nodes, get().edges);
+        },
+        cleanEmptyEdges: () => {
+          const layouted = get().edges.filter((edge) => {
+            const sourceNode = get().nodes.find(
+              (node) => node.id === edge.source
+            );
+            const targetNode = get().nodes.find(
+              (node) => node.id === edge.target
+            );
+            return sourceNode && targetNode;
+          });
+
+          set({ edges: layouted });
         },
         onChooseType: (id, type, parentHeight = 250) => {
           const layouted = createNewNode(
@@ -195,22 +219,26 @@ const createStore = (id) =>
             id,
             parentHeight,
             "audioEditor",
-            { modelType: "stt", file }
+            { modelType: "stt" }
           );
-          const lastNode = layouted.nodes[layouted.nodes.length - 1];
 
-          // create a new input node and edge
-          const inputLayouted = createNewNode(
-            layouted.nodes,
-            layouted.edges,
-            lastNode.id,
-          );
+          const lastNode = layouted.nodes[layouted.nodes.length - 1];
+          useFileStore.setState({
+            files: [
+              ...useFileStore.getState().files,
+              {
+                name: file.name,
+                data: file,
+                id: lastNode.id,
+              },
+            ],
+          });
 
           set({
-            nodes: [...inputLayouted.nodes],
-            edges: [...inputLayouted.edges],
+            nodes: [...layouted.nodes],
+            edges: [...layouted.edges],
           });
-        }
+        },
       }),
       {
         name: `store-${id}`,
@@ -322,4 +350,4 @@ const storeManager = {
 
 storeManager.initializeStores();
 
-export { storeManager, useConfigStore };
+export { storeManager, useConfigStore, useFileStore };

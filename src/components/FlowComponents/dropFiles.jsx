@@ -20,22 +20,22 @@ function Dropzone({ id, disable }) {
     for (const file of acceptedFiles) {
       const reader = new FileReader();
       reader.onload = () => {
-        onAudioDrop(reader.result);
+        onAudioDrop(id, reader.result, 100);
       };
       reader.readAsDataURL(file);
     }
-  }, []);
+  }, [id, onAudioDrop]);
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
     accept: {
-      "audio/*": ["mp3", "wav", "ogg"],
+      "audio/*": [".wav", ".mp3", ".m4a"],
     },
-    multiple: true,
+    multiple: false,
   });
 
   return (
-    <Container title="Input" innerRef={nodeRef} id={id} className="w-[500px]">
+    <Container title="Editor" innerRef={nodeRef} id={id} className="w-[500px]">
       <div
         {...getRootProps()}
         className="mt-4 flex items-center justify-center h-full w-full border-dashed	rounded border-2 border-gray-400 hover:bg-gray-800 py-4 px-12  cursor-pointer text-center whitespace-nowrap"
