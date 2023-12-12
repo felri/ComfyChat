@@ -230,7 +230,7 @@ function ChatOutputNode({ id, data }) {
           dangerouslySetInnerHTML={{
             __html: formatStreamContent(streamContent),
           }}
-          className="w-full h-full"
+          className="w-full h-full line-height-[1.6]"
         />
       )}
       <div className="flex justify-end items-center absolute bottom-0 right-0 w-full h-10 cursor-pointer">

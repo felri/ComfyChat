@@ -144,7 +144,7 @@ export function getMessageHistory(id, nodes, edges) {
 }
 
 export function calculateNewNodePosition(nodes, edges, parentId, parentHeight) {
-  const horizontalOffset = 800; // Horizontal offset for each child
+  const horizontalOffset = 850; // Horizontal offset for each child
   const verticalSpacing = 100; // Vertical spacing from the parent node
 
   // Find the parent node
