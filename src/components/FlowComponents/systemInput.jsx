@@ -60,9 +60,8 @@ function SystemMessageNode({ id, data }) {
     imageModel,
     TTSModel,
     STTModel,
-    temperature,
   } = useConfigStore((state) => state);
-  const { createNewInputNode, onDataTextUpdate } = store(
+  const { createNewInputNode, onDataTextUpdate, temperature, updateStore: updateStoreNode  } = store(
     useCallback((state) => state, [])
   );
 
@@ -92,7 +91,7 @@ function SystemMessageNode({ id, data }) {
 
   const onTemperatureChange = useCallback(
     (e) => {
-      updateStore(e.target.name, e.target.value);
+      updateStoreNode(e.target.name, e.target.value);
     },
     [updateStore]
   );
