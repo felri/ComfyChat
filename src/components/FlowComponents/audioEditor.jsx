@@ -10,7 +10,6 @@ import {
   CiPause1,
   CiZoomIn,
   CiZoomOut,
-  CiRedo,
   CiStop1,
 } from "react-icons/ci";
 import { RxSpaceBetweenHorizontally } from "react-icons/rx";
@@ -131,14 +130,6 @@ function AudioEditor({ id }) {
     ]);
   }, [regions, wavesurferRef]);
 
-  const removeLastRegion = useCallback(() => {
-    let nextRegions = [...regions];
-
-    nextRegions.pop();
-
-    setRegions(nextRegions);
-  }, [regions]);
-
   const play = useCallback(() => {
     setIsPlaying(!isPlaying);
     wavesurferRef.current.playPause();
@@ -147,12 +138,27 @@ function AudioEditor({ id }) {
   const stop = useCallback(() => {
     setIsPlaying(false);
     wavesurferRef.current.stop();
-  }, []);
+    wavesurferRef.current.seekTo(
+      regions[0].start / wavesurferRef.current.getDuration()
+    );
+  }, [regions]);
 
-  const handleRegionUpdate = useCallback((region, smth) => {
-    console.log("region-update-end --> region:", region);
-    console.log(smth);
-  }, []);
+  const handleRegionUpdate = useCallback(
+    (region) => {
+      const updatedRegions = regions.map((r) => {
+        if (r.id === region.id) {
+          return region;
+        }
+        return r;
+      });
+      // set start play position
+      wavesurferRef.current.seekTo(
+        region.start / wavesurferRef.current.getDuration()
+      );
+      setRegions(updatedRegions);
+    },
+    [regions]
+  );
 
   const increaseZoom = () => {
     if (wavesurferRef.current.options.minPxPerSec >= 100) return;
@@ -163,6 +169,21 @@ function AudioEditor({ id }) {
     if (wavesurferRef.current.options.minPxPerSec <= 1) return;
     wavesurferRef.current.zoom(wavesurferRef.current.options.minPxPerSec - 10);
   };
+
+  const setFullAudioAsRegion = useCallback(() => {
+    if (!wavesurferRef.current) return;
+
+    let region = regions[0];
+
+    if (!region) return;
+
+    const max = Math.min(wavesurferRef.current.getDuration(), 600); // 600 seconds = 10 minutes
+
+    if (region.end === max) return;
+
+    region = { ...region, start: 0, end: max };
+    setRegions([region]);
+  }, [regions, wavesurferRef]);
 
   if (!audioFile) return null;
 
@@ -199,14 +220,9 @@ function AudioEditor({ id }) {
             <CiStop1 size={35} />
           </div>
         </Tooltip>
-        <Tooltip position="bottom-full" text="Generate region">
-          <div onClick={generateRegion}>
+        <Tooltip position="bottom-full" text="Set entire audio as region">
+          <div onClick={setFullAudioAsRegion}>
             <RxSpaceBetweenHorizontally size={32} />
-          </div>
-        </Tooltip>
-        <Tooltip position="bottom-full" text="Remove last region">
-          <div onClick={removeLastRegion}>
-            <CiRedo size={35} />
           </div>
         </Tooltip>
         <Tooltip position="bottom-full" text="Increase zoom">

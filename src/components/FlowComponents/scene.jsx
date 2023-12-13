@@ -56,7 +56,6 @@ function Flow() {
     onNodesChange,
     onEdgesChange,
     deleteChatNode,
-    cleanEmptyEdges,
     resetStore,
   } = store(selector, (state, next) => {
     return (
@@ -74,10 +73,6 @@ function Flow() {
     );
   });
   const [currentNodeLength, setCurrentNodeLength] = useState(nodes?.length);
-
-  useEffect(() => {
-    cleanEmptyEdges();
-  }, [cleanEmptyEdges]);
 
   useEffect(() => {
     if (nodes.length === currentNodeLength) return;

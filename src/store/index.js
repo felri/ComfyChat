@@ -105,19 +105,6 @@ const createStore = (id) =>
         getHistory: (id) => {
           return getMessageHistory(id, get().nodes, get().edges);
         },
-        cleanEmptyEdges: () => {
-          const layouted = get().edges.filter((edge) => {
-            const sourceNode = get().nodes.find(
-              (node) => node.id === edge.source
-            );
-            const targetNode = get().nodes.find(
-              (node) => node.id === edge.target
-            );
-            return sourceNode && targetNode;
-          });
-
-          set({ edges: layouted });
-        },
         onChooseType: (id, type, parentHeight = 250) => {
           const layouted = createNewNode(
             get().nodes,
@@ -175,7 +162,7 @@ const createStore = (id) =>
             id,
             parentHeight,
             "stt",
-            { modelType: "stt" }
+            { type: "stt" }
           );
 
           set({

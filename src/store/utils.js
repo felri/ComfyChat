@@ -43,23 +43,6 @@ export function deleteOneNode(nodes, edges, nodeId) {
   }
 }
 
-export function getModelNameFromType(type) {
-  switch (type) {
-    case "chat":
-      return "davinci";
-    case "search":
-      return "davinci";
-    case "answers":
-      return "curie";
-    case "classification":
-      return "curie";
-    case "translation":
-      return "curie";
-    default:
-      return "davinci";
-  }
-}
-
 export function getStoredStoreIds() {
   const storeIds = [];
   for (let i = 0; i < localStorage.length; i++) {

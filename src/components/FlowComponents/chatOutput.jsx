@@ -74,7 +74,10 @@ function ChatOutputNode({ id, data }) {
       if (line.startsWith(backticks)) {
         if (inCodeBlock) {
           // End of a code block
-          formattedText += `<div class="p-1 px-2 bg-black rounded-t flex items-center justify-start text-white">${language}</div><pre><code class="${language} chatoutput nodrag">${escapeHtml(
+          formattedText += `<div class="p-1 px-2 bg-black rounded-t flex items-center justify-start text-white">
+              <span>${language}</span>
+            </div>
+              <pre><code class="${language} chatoutput nodrag">${escapeHtml(
             codeContent
           )}</code></pre>\n`;
           inCodeBlock = false;
