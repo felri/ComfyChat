@@ -1,6 +1,16 @@
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
 
+function arrayBufferToBase64(buffer) {
+  let binary = "";
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return window.btoa(binary);
+}
+
 export const ffmpegLoad = async () => {
   const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.4/dist/esm";
   const ffmpeg = new FFmpeg();
@@ -50,9 +60,11 @@ export const cutAudio = async (ffmpeg, file, start, end) => {
     const data = await ffmpeg.readFile("output.mp3");
     await ffmpeg.deleteFile(fileName);
     await ffmpeg.deleteFile("output.mp3");
-    // Cleanup: deleteFile the input and output files from FFmpeg's file system
+    // Convert ArrayBuffer to base64
+    const base64String = arrayBufferToBase64(data.buffer);
+
     console.log("Cut audio successfully");
-    return new File([data.buffer], "output.mp3");
+    return `data:audio/mpeg;base64,${base64String}`;
   } catch (error) {
     console.error("Error during ffmpeg processing:", error);
     // Cleanup even in case of error

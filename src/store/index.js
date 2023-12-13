@@ -31,7 +31,7 @@ function createModelInstance(apiKey) {
   }
 }
 
-const useFileStore = create((set) => ({
+const useFileStore = create((set, get) => ({
   files: [],
   ffmpeg: null,
   setFiles: (files) => set({ files }),
@@ -52,8 +52,10 @@ const useFileStore = create((set) => ({
       start,
       end
     );
-    const pastState = useFileStore.getState();
-    const pastFiles = pastState.files;
+    const pastFiles = get().files;
+
+    console.log(data);
+    console.log(pastFiles);
 
     const newFiles = pastFiles.map((f) => {
       if (f.id === id) {
@@ -61,6 +63,7 @@ const useFileStore = create((set) => ({
       }
       return f;
     });
+    console.log(newFiles);
     set({ files: newFiles });
   },
 }));
@@ -265,7 +268,6 @@ const createStore = (id) =>
 
           return get().findParentNodeByType(edges[0].source, type);
         },
-
         onAudioEditorSend: (id, start, end, type) => {
           const layouted = createNewNode(
             get().nodes,
@@ -281,6 +283,20 @@ const createStore = (id) =>
             edges: [...layouted.edges],
           });
         },
+        createSTTOutputNode: (id) => {
+          const layouted = createNewNode(
+            get().nodes,
+            get().edges,
+            id,
+            200,
+            "sttOutput"
+          );
+
+          set({
+            nodes: [...layouted.nodes],
+            edges: [...layouted.edges],
+          });
+        }
       }),
       {
         name: `store-${id}`,

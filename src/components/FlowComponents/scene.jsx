@@ -9,7 +9,8 @@ import { FaGithub } from "react-icons/fa";
 import ApiKeyNode from "./apiKey";
 import FFMpegNode from "./ffmpegNode";
 import UserInputNode from "./userInput";
-import SystemMessageInput from "./systemInput.jsx";
+import SttOutputNode from "./sttOutput";
+import SystemMessageInput from "./systemInput";
 import DropFilesNode from "./dropFiles";
 import Controls from "./controls";
 import EditorNode from "./mediaEditor";
@@ -32,6 +33,7 @@ const selector = (state) => ({
   deleteChatNode: state.deleteChatNode,
   resetStore: state.resetStore,
   cleanEmptyEdges: state.cleanEmptyEdges,
+
 });
 
 const nodeTypes = {
@@ -42,6 +44,7 @@ const nodeTypes = {
   stt: DropFilesNode,
   editor: EditorNode,
   ffmpeg: FFMpegNode,
+  sttOutput: SttOutputNode,
 };
 
 function Flow() {

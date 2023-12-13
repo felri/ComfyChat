@@ -1,4 +1,4 @@
-import { useCallback, useRef, useEffect, useState } from "react";
+import { useCallback, useRef, useEffect, useState, useMemo } from "react";
 import { FaFileAudio } from "react-icons/fa6";
 import PropTypes from "prop-types";
 import Container from "../Common/container";
@@ -24,13 +24,16 @@ const steps = {
   },
 };
 
-function Dropzone({ id, data, type }) {
+function FFmpegNode({ id, data, type }) {
   const nodeRef = useRef(null);
 
   const store = storeManager.getSelectedStore();
-  const { findParentNodeByType } = store(({ findParentNodeByType }) => ({
-    findParentNodeByType,
-  }));
+  const { findParentNodeByType, createSTTOutputNode } = store(
+    ({ findParentNodeByType, createSTTOutputNode }) => ({
+      findParentNodeByType,
+      createSTTOutputNode,
+    })
+  );
 
   const [step, setStep] = useState("loading");
   const { ffmpeg, setFFmpeg, files, cutAudio } = useFileStore(
@@ -42,6 +45,10 @@ function Dropzone({ id, data, type }) {
     })
   );
 
+  const mediaParentNode = useMemo(() => {
+    return findParentNodeByType(id, "editor");
+  }, [id]);
+
   useEffect(() => {
     if (!ffmpeg) {
       setFFmpeg();
@@ -49,13 +56,13 @@ function Dropzone({ id, data, type }) {
   }, [ffmpeg, setFFmpeg]);
 
   const handleCutAudio = useCallback(
-    (file) => {
+    async (file) => {
       if (file) {
         setStep("working");
         try {
-          cutAudio(id, file, data.start, data.end).then(() => {
-            setStep("done");
-          });
+          await cutAudio(mediaParentNode.id, file, data.start, data.end);
+          setStep("done");
+          createSTTOutputNode(id);
         } catch (e) {
           setStep("error");
           console.log(e);
@@ -69,13 +76,8 @@ function Dropzone({ id, data, type }) {
   );
 
   useEffect(() => {
-    const mediaParentNode = findParentNodeByType(id, "editor");
-    console.log(mediaParentNode);
     if (!mediaParentNode) return;
-
     const file = files.find((f) => f.id === mediaParentNode.id.toString());
-    console.log(files);
-    console.log(file);
     if (files && file) {
       handleCutAudio(file);
     }
@@ -94,10 +96,10 @@ function Dropzone({ id, data, type }) {
   );
 }
 
-Dropzone.propTypes = {
+FFmpegNode.propTypes = {
   id: PropTypes.string,
   data: PropTypes.object,
   type: PropTypes.string,
 };
 
-export default Dropzone;
+export default FFmpegNode;
