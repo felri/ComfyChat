@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import { useOnSelectionChange } from "reactflow";
+import { storeManager } from "../../store";
+import { HiOutlineTrash } from "react-icons/hi2";
 
 function Container({
   children,
@@ -9,8 +11,11 @@ function Container({
   innerRef,
   id,
 }) {
+  const store = storeManager.getSelectedStore();
+  const { deleteUserNode } = store(useCallback((state) => state, []));
+
   const [selectedNodes, setSelectedNodes] = useState([]);
-  
+
   useOnSelectionChange({
     onChange: ({ nodes }) => {
       setSelectedNodes(nodes.map((node) => node.id));
@@ -29,6 +34,16 @@ function Container({
       <h1 className="absolute top-0 left-0 flex items-center justify-center w-full text-sm text-white bg-gray-800 p-1">
         {title}
       </h1>
+      {id && (
+        <div className="absolute top-1 right-1 hover:cursor-pointer">
+          <HiOutlineTrash
+            opacity={0.7}
+            size={20}
+            onClick={() => deleteUserNode(id)}
+          />
+        </div>
+      )}
+
       {children}
     </div>
   );

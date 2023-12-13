@@ -89,7 +89,7 @@ function ApiKeyNode({ id }) {
   }, [apiKey, createOpenAIInstance]);
 
   return (
-    <Container title="OpenAI Config" id="1">
+    <Container title="OpenAI Config">
       <div ref={nodeRef}>
         <TextInput
           type="text"

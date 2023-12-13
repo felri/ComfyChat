@@ -7,11 +7,12 @@ import Tooltip from "../Common/tooltip";
 import { CiFileOn } from "react-icons/ci";
 import { FaGithub } from "react-icons/fa";
 import ApiKeyNode from "./apiKey";
+import FFMpegNode from "./ffmpegNode";
 import UserInputNode from "./userInput";
 import SystemMessageInput from "./systemInput.jsx";
 import DropFilesNode from "./dropFiles";
 import Controls from "./controls";
-import AudioEditorNode from "./audioEditor";
+import EditorNode from "./mediaEditor";
 import ChatOutputNode from "./chatOutput";
 import History from "../Common/history";
 
@@ -39,7 +40,8 @@ const nodeTypes = {
   chatOutput: ChatOutputNode,
   apiKey: ApiKeyNode,
   stt: DropFilesNode,
-  audioEditor: AudioEditorNode,
+  editor: EditorNode,
+  ffmpeg: FFMpegNode,
 };
 
 function Flow() {

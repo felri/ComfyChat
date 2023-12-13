@@ -10,6 +10,7 @@ import {
 } from "./utils";
 import OpenAI from "openai";
 import { initialLayouted } from "./constants";
+import { ffmpegLoad, cutAudio } from "../utils/ffmpeg";
 import {
   visionModels,
   textModels,
@@ -32,6 +33,7 @@ function createModelInstance(apiKey) {
 
 const useFileStore = create((set) => ({
   files: [],
+  ffmpeg: null,
   setFiles: (files) => set({ files }),
   addFile: (file) => set((state) => ({ files: [...state.files, file] })),
   removeFile: (file) =>
@@ -39,6 +41,28 @@ const useFileStore = create((set) => ({
       files: state.files.filter((f) => f.name !== file.name),
     })),
   removeAllFiles: () => set({ files: [] }),
+  setFFmpeg: async () => {
+    const ffmpeg = await ffmpegLoad();
+    set({ ffmpeg });
+  },
+  cutAudio: async (id, file, start, end) => {
+    const data = await cutAudio(
+      useFileStore.getState().ffmpeg,
+      file,
+      start,
+      end
+    );
+    const pastState = useFileStore.getState();
+    const pastFiles = pastState.files;
+
+    const newFiles = pastFiles.map((f) => {
+      if (f.id === id) {
+        return { ...f, data };
+      }
+      return f;
+    });
+    set({ files: newFiles });
+  },
 }));
 
 // Factory function to create a new store
@@ -205,21 +229,52 @@ const createStore = (id) =>
             get().edges,
             id,
             parentHeight,
-            "audioEditor",
+            "editor",
             { modelType: "stt" }
           );
 
+          console.log(file);
           const lastNode = layouted.nodes[layouted.nodes.length - 1];
           useFileStore.setState({
             files: [
               ...useFileStore.getState().files,
               {
                 name: file.name,
-                data: file,
+                data: file.result,
                 id: lastNode.id,
               },
             ],
           });
+
+          set({
+            nodes: [...layouted.nodes],
+            edges: [...layouted.edges],
+          });
+        },
+        findParentNodeByType: (id, type) => {
+          const node = get().nodes.find((node) => node.id === id);
+          const edges = get().edges.filter((edge) => edge.target === id);
+
+          if (node.type === type) {
+            return node;
+          }
+
+          if (edges.length === 0) {
+            return null;
+          }
+
+          return get().findParentNodeByType(edges[0].source, type);
+        },
+
+        onAudioEditorSend: (id, start, end, type) => {
+          const layouted = createNewNode(
+            get().nodes,
+            get().edges,
+            id,
+            200,
+            "ffmpeg",
+            { start, end, type }
+          );
 
           set({
             nodes: [...layouted.nodes],

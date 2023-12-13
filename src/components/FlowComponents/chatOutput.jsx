@@ -4,7 +4,6 @@ import { Handle, Position } from "reactflow";
 import { useReactFlow } from "reactflow";
 import Container from "../Common/container";
 import TextArea from "../Common/textarea";
-import { HiOutlineTrash } from "react-icons/hi2";
 import hljs from "highlight.js";
 import { IoIosAdd } from "react-icons/io";
 import PropTypes from "prop-types";
@@ -33,7 +32,6 @@ function ChatOutputNode({ id, data }) {
     getHistory,
     updateChildrenPosition,
     onDataTextUpdate,
-    deleteUserNode,
     createNewInputNode,
   } = store(useCallback((state) => state, []));
   const [streamContent, setStreamContent] = useState("");
@@ -200,18 +198,12 @@ function ChatOutputNode({ id, data }) {
       className="w-[800px] min-h-[520px] overflow-y-scroll flex items-left justify-start overflow-hidden pb-10 relative"
       id={id}
     >
-      <div className="absolute top-1 right-1 hover:cursor-pointer flex space-x-2">
-        {streaming ? (
+      <div className="absolute top-1 right-6 hover:cursor-pointer flex space-x-2">
+        {streaming && (
           <IoStopCircleOutline
             size={25}
             className="hover:cursor-pointer"
             onClick={stopStreaming}
-          />
-        ) : (
-          <HiOutlineTrash
-            opacity={0.7}
-            size={20}
-            onClick={() => deleteUserNode(id)}
           />
         )}
       </div>

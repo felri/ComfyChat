@@ -16,15 +16,19 @@ function Dropzone({ id, disable }) {
     }
   );
 
-  const onDrop = useCallback((acceptedFiles) => {
-    for (const file of acceptedFiles) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        onAudioDrop(id, reader.result, 100);
-      };
-      reader.readAsDataURL(file);
-    }
-  }, [id, onAudioDrop]);
+  const onDrop = useCallback(
+    (acceptedFiles) => {
+      for (const file of acceptedFiles) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          reader.name = file.name;
+          onAudioDrop(id, reader, 100);
+        };
+        reader.readAsDataURL(file);
+      }
+    },
+    [id, onAudioDrop]
+  );
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
@@ -35,7 +39,12 @@ function Dropzone({ id, disable }) {
   });
 
   return (
-    <Container title="Editor" innerRef={nodeRef} id={id} className="w-[500px]">
+    <Container
+      title="Dropzone"
+      innerRef={nodeRef}
+      id={id}
+      className="w-[500px]"
+    >
       <div
         {...getRootProps()}
         className="mt-4 flex items-center justify-center h-full w-full border-dashed	rounded border-2 border-gray-400 hover:bg-gray-800 py-4 px-12  cursor-pointer text-center whitespace-nowrap"

@@ -63,13 +63,6 @@ Shift + N to create new chat
 
   return (
     <Container title="Input" innerRef={nodeRef} id={id} className="w-[800px]">
-      <div className="absolute top-1 right-1 hover:cursor-pointer">
-        <HiOutlineTrash
-          opacity={0.7}
-          size={20}
-          onClick={() => deleteUserNode(id)}
-        />
-      </div>
       <TextArea
         id={id}
         disabled={!openAIInstance}

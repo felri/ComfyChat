@@ -14,21 +14,21 @@ import {
 } from "react-icons/ci";
 import { RxSpaceBetweenHorizontally } from "react-icons/rx";
 import Tooltip from "../Common/tooltip";
-import { useFileStore } from "../../store";
+import { useFileStore, storeManager } from "../../store";
 
-/**
- * @param min
- * @param max
- * @returns {*}
- */
 function generateNum(min, max) {
   return Math.random() * (max - min + 1) + min;
 }
 
-function AudioEditor({ id }) {
+function Editor({ id }) {
+  const store = storeManager.getSelectedStore();
   const [isLoaded, setIsLoaded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const { files } = useFileStore((state) => state);
+  const { files } = useFileStore(({ files }) => ({ files }));
+
+  const { onAudioEditorSend } = store(({ onAudioEditorSend }) => ({
+    onAudioEditorSend,
+  }));
 
   const audioFile = files.find((file) => file.id === id);
 
@@ -89,17 +89,8 @@ function AudioEditor({ id }) {
         wavesurferRef.current.on("region-created", regionCreatedHandler);
 
         wavesurferRef.current.on("ready", () => {
-          console.log("WaveSurfer is ready");
           setIsLoaded(true);
           generateRegion();
-        });
-
-        wavesurferRef.current.on("region-removed", (region) => {
-          console.log("region-removed --> ", region);
-        });
-
-        wavesurferRef.current.on("loading", (data) => {
-          console.log("loading --> ", data);
         });
 
         if (window) {
@@ -172,42 +163,47 @@ function AudioEditor({ id }) {
 
   const setFullAudioAsRegion = useCallback(() => {
     if (!wavesurferRef.current) return;
-
     let region = regions[0];
-
     if (!region) return;
-
+    setRegions([]);
     const max = Math.min(wavesurferRef.current.getDuration(), 600); // 600 seconds = 10 minutes
-
-    if (region.end === max) return;
-
     region = { ...region, start: 0, end: max };
     setRegions([region]);
+    wavesurferRef.current.seekTo(0);
   }, [regions, wavesurferRef]);
 
-  if (!audioFile) return null;
+  const handleSend = useCallback(() => {
+    if (!wavesurferRef.current) return;
+    const region = regions[0];
+    if (!region) return;
+    onAudioEditorSend(id, region.start, region.end, "stt");
+  }, [id, onAudioEditorSend, regions]);
 
   return (
-    <Container title="Input" id={id} className="w-[1200px] h-[300px]">
+    <Container title="Editor" id={id} className="w-[1200px] h-[300px]">
       <div>
-        <WaveSurfer
-          plugins={plugins}
-          onMount={handleWSMount}
-          cursorColor="transparent"
-          container={`#wavesurfer${id}`}
-        >
-          <WaveForm className="w-full" id={`wavesurfer${id}`}>
-            {isLoaded &&
-              regions.map((regionProps) => (
-                <Region
-                  onUpdateEnd={handleRegionUpdate}
-                  key={regionProps.id}
-                  {...regionProps}
-                />
-              ))}
-          </WaveForm>
-          <div id="timeline" />
-        </WaveSurfer>
+        {!audioFile ? (
+          <p className="text-center text-red-500">No audio file found</p>
+        ) : (
+          <WaveSurfer
+            plugins={plugins}
+            onMount={handleWSMount}
+            cursorColor="transparent"
+            container={`#wavesurfer${id}`}
+          >
+            <WaveForm className="w-full" id={`wavesurfer${id}`}>
+              {isLoaded &&
+                regions.map((regionProps) => (
+                  <Region
+                    onUpdateEnd={handleRegionUpdate}
+                    key={regionProps.id}
+                    {...regionProps}
+                  />
+                ))}
+            </WaveForm>
+            <div id="timeline" />
+          </WaveSurfer>
+        )}
       </div>
       <div className="flex items-center justify-center space-x-4 h-full">
         <Tooltip position="bottom-full" text="Play">
@@ -220,7 +216,7 @@ function AudioEditor({ id }) {
             <CiStop1 size={35} />
           </div>
         </Tooltip>
-        <Tooltip position="bottom-full" text="Set entire audio as region">
+        <Tooltip position="bottom-full" text="Select max audio">
           <div onClick={setFullAudioAsRegion}>
             <RxSpaceBetweenHorizontally size={32} />
           </div>
@@ -239,17 +235,21 @@ function AudioEditor({ id }) {
 
       <Handle type="source" position={Position.Bottom} />
       <Handle type="target" position={Position.Top} />
-
-      <div className="absolute bottom-0 right-0 flex items-center justify-center pr-5 space-x-2 pb-2 cursor-pointer hover:text-red-500 transition-colors duration-300 ease-in-out">
-        <CiPlay1 size={35} />
-        <p>Transcribe</p>
-      </div>
+      {audioFile && (
+        <div
+          onClick={handleSend}
+          className="absolute bottom-0 right-0 flex items-center justify-center pr-5 space-x-2 pb-2 cursor-pointer hover:text-red-500 transition-colors duration-300 ease-in-out"
+        >
+          <CiPlay1 size={35} />
+          <p>Transcribe</p>
+        </div>
+      )}
     </Container>
   );
 }
 
-AudioEditor.propTypes = {
+Editor.propTypes = {
   id: PropTypes.string,
 };
 
-export default AudioEditor;
+export default Editor;
