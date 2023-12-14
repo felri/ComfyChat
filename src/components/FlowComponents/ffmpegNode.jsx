@@ -60,7 +60,7 @@ function FFmpegNode({ id, data, type }) {
       if (file) {
         setStep("working");
         try {
-          await cutAudio(mediaParentNode.id, file, data.start, data.end);
+          await cutAudio(id, file, data.start, data.end);
           setStep("done");
           createSTTOutputNode(id);
         } catch (e) {
@@ -72,7 +72,7 @@ function FFmpegNode({ id, data, type }) {
         console.log("file not found");
       }
     },
-    [data.end, data.start, id]
+    [data.end, data.start, id, mediaParentNode.id]
   );
 
   useEffect(() => {
@@ -81,7 +81,7 @@ function FFmpegNode({ id, data, type }) {
     if (files && file) {
       handleCutAudio(file);
     }
-  }, [id]);
+  }, [id, mediaParentNode.id]);
 
   return (
     <Container title="FFmpeg" innerRef={nodeRef} id={id} className="w-[500px]">

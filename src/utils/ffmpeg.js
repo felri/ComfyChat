@@ -38,50 +38,75 @@ export const ffmpegLoad = async () => {
   return ffmpeg;
 };
 
-export const cutAudio = async (ffmpeg, file, start, end) => {
-  const startStr = start.toString();
-  const endStr = end.toString();
-
+export const processMedia = async (
+  ffmpeg,
+  file,
+  operation,
+  start = null,
+  end = null
+) => {
   const fileType = file.name.split(".");
   const fileName = "input." + fileType[fileType.length - 1];
-  await ffmpeg.writeFile(fileName, await fetchFile(file.data));
+  const outputFileName = "output.mp3";
 
   try {
-    await ffmpeg.exec([
-      "-i",
-      fileName,
-      "-ss",
-      startStr,
-      "-to",
-      endStr,
-      "output.mp3",
-      "-y",
-    ]);
-    const data = await ffmpeg.readFile("output.mp3");
     await ffmpeg.deleteFile(fileName);
+  } catch (cleanupError) {
+    console.log("Error during cleanup:", cleanupError);
+  }
+
+  try {
     await ffmpeg.deleteFile("output.mp3");
+  } catch (cleanupError) {
+    console.log("Error during cleanup:", cleanupError);
+  }
+
+  try {
+    await ffmpeg.writeFile(fileName, await fetchFile(file.data));
+  } catch (writeError) {
+    console.error("Error during writeFile:", writeError);
+    console.log("Retrying...");
+
+    try {
+      ffmpeg = await ffmpegLoad();
+      await ffmpeg.writeFile(fileName, await fetchFile(file.data));
+    } catch (retryError) {
+      console.error("Error during retry writeFile:", retryError);
+    }
+  }
+
+  try {
+    let ffmpegCommand = ["-i", fileName];
+
+    if (operation === "cutAudio") {
+      ffmpegCommand.push("-ss", start.toString(), "-to", end.toString());
+    } else if (operation === "videoToAudio") {
+      ffmpegCommand.push("-vn", "-acodec", "copy");
+    }
+
+    ffmpegCommand.push(outputFileName, "-y");
+
+    await ffmpeg.exec(ffmpegCommand);
+    const data = await ffmpeg.readFile(outputFileName);
+
+    // Cleanup
+    await ffmpeg.deleteFile(fileName);
+    await ffmpeg.deleteFile(outputFileName);
+
     // Convert ArrayBuffer to base64
     const base64String = arrayBufferToBase64(data.buffer);
 
-    console.log("Cut audio successfully");
+    console.log("Operation completed successfully");
     return `data:audio/mpeg;base64,${base64String}`;
   } catch (error) {
     console.error("Error during ffmpeg processing:", error);
+
     // Cleanup even in case of error
     try {
       await ffmpeg.deleteFile(fileName);
-      await ffmpeg.deleteFile("output.mp3");
+      await ffmpeg.deleteFile(outputFileName);
     } catch (cleanupError) {
       console.error("Error during cleanup:", cleanupError);
     }
   }
-};
-
-export const videoToAudio = async (ffmpeg, file) => {
-  const fileType = file.name.split(".");
-  const fileName = fileType.slice(0, fileType.length - 1).join(".");
-  await ffmpeg.writeFile(fileName, await fetchFile(file));
-  await ffmpeg.exec(["-i", fileName, "output.mp3"]);
-  const data = await ffmpeg.readFile("output.mp3");
-  return new File([data.buffer], "output.mp3");
 };

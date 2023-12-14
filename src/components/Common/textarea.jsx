@@ -25,8 +25,8 @@ function TextArea({
   }, []);
 
   return (
-    <div className="flex flex-col mt-2">
-      <label htmlFor="text">{label}</label>
+    <div className="flex flex-col mt-2 w-full">
+      <label>{label}</label>
       <TextareaAutosize
         ref={textRef}
         autoFocus={autoFocus}

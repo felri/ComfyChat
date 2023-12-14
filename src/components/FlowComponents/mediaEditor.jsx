@@ -172,12 +172,20 @@ function Editor({ id }) {
     wavesurferRef.current.seekTo(0);
   }, [regions, wavesurferRef]);
 
-  const handleSend = useCallback(() => {
+  const handleSend = () => {
     if (!wavesurferRef.current) return;
     const region = regions[0];
     if (!region) return;
     onAudioEditorSend(id, region.start, region.end, "stt");
-  }, [id, onAudioEditorSend, regions]);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (wavesurferRef.current) {
+        wavesurferRef.current.destroy();
+      }
+    };
+  }, []);
 
   return (
     <Container title="Editor" id={id} className="w-[1200px] h-[300px]">
@@ -241,7 +249,7 @@ function Editor({ id }) {
           className="absolute bottom-0 right-0 flex items-center justify-center pr-5 space-x-2 pb-2 cursor-pointer hover:text-red-500 transition-colors duration-300 ease-in-out"
         >
           <CiPlay1 size={35} />
-          <p>Transcribe</p>
+          <p>Prepare audio</p>
         </div>
       )}
     </Container>

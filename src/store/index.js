@@ -10,7 +10,7 @@ import {
 } from "./utils";
 import OpenAI from "openai";
 import { initialLayouted } from "./constants";
-import { ffmpegLoad, cutAudio } from "../utils/ffmpeg";
+import { ffmpegLoad, processMedia } from "../utils/ffmpeg";
 import {
   visionModels,
   textModels,
@@ -46,24 +46,23 @@ const useFileStore = create((set, get) => ({
     set({ ffmpeg });
   },
   cutAudio: async (id, file, start, end) => {
-    const data = await cutAudio(
+    const data = await processMedia(
       useFileStore.getState().ffmpeg,
       file,
+      "cutAudio",
       start,
       end
     );
-    const pastFiles = get().files;
 
-    console.log(data);
-    console.log(pastFiles);
+    const newFiles = [
+      ...get().files,
+      {
+        name: file.name,
+        data,
+        id,
+      },
+    ];
 
-    const newFiles = pastFiles.map((f) => {
-      if (f.id === id) {
-        return { ...f, data };
-      }
-      return f;
-    });
-    console.log(newFiles);
     set({ files: newFiles });
   },
 }));
@@ -296,7 +295,7 @@ const createStore = (id) =>
             nodes: [...layouted.nodes],
             edges: [...layouted.edges],
           });
-        }
+        },
       }),
       {
         name: `store-${id}`,

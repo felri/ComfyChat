@@ -14,7 +14,7 @@ function Dropdown({
 
   return (
     <div className="flex flex-col w-full">
-      <label htmlFor="text">{label}</label>
+      <label>{label}</label>
       <select
         onChange={handleChange}
         className="nodrag w-full"

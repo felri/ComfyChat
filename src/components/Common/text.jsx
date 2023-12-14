@@ -15,7 +15,7 @@ function TextInput({
 
   return (
     <div className="flex flex-col">
-      <label htmlFor="text">{label}</label>
+      <label>{label}</label>
       <input
         {...props}
         onChange={handleChange}

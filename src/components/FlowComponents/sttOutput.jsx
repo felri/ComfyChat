@@ -11,7 +11,10 @@ import { IoStopCircleOutline } from "react-icons/io5";
 import { FaSave } from "react-icons/fa";
 import { IoIosRefresh } from "react-icons/io";
 import { CiEdit } from "react-icons/ci";
-
+import { uploadAudio } from "../../api/stt";
+import Dropdown from "../Common/dropdown";
+import { responseFormatSTT, languagesSTT } from "../../store/constants";
+import Loading from "../Common/loading";
 import "highlight.js/styles/github-dark.css"; // Or any other style you prefer
 
 const AudioPlayer = ({ file }) => {
@@ -35,16 +38,6 @@ const AudioPlayer = ({ file }) => {
       >
         <source src={file?.data} type="audio/mp3" />
       </audio>
-      {isPlaying && (
-        <IoStopCircleOutline
-          size={20}
-          className="ml-2 hover:cursor-pointer"
-          onClick={() => {
-            audioRef.current.pause();
-            setIsPlaying(false);
-          }}
-        />
-      )}
     </div>
   );
 };
@@ -58,40 +51,51 @@ AudioPlayer.propTypes = {
 function SttOutputNode({ id, data }) {
   const containerRef = useRef(null);
   const store = storeManager.getSelectedStore();
-  const abortRef = useRef(false);
+  const [responseType, setResponseType] = useState("text");
+  const [language, setLanguage] = useState("English");
+  const [loading, setLoading] = useState(false);
+  const [text, setText] = useState(data.text);
 
-  const { sttModel } = useConfigStore((state) => ({
-    sttModel: state.sttModel,
+  const { STTModel, apiKey } = useConfigStore((state) => ({
+    STTModel: state.STTModel,
+    apiKey: state.apiKey,
   }));
 
   const { files } = useFileStore(({ files }) => ({ files }));
 
-  const { findParentNodeByType } = store(
-    useCallback(
-      ({ findParentNodeByType }) => ({
-        findParentNodeByType,
-      }),
-      []
-    )
+  const { findParentNodeByType, onDataTextUpdate } = store(
+    ({ findParentNodeByType, onDataTextUpdate }) => ({
+      findParentNodeByType,
+      onDataTextUpdate,
+    })
   );
 
   const file = useMemo(() => {
     if (!id) return null;
-    const parent = findParentNodeByType(id, "editor");
+    const parent = findParentNodeByType(id, "ffmpeg");
     if (!parent) return null;
-    return files.find((f) => f.id === parent.id.toString());
-  }, [data, files, findParentNodeByType]);
+    const file = files.find((f) => f.id === parent.id);
+    return file;
+  }, [id, findParentNodeByType, files]);
 
-  useEffect(() => {
-    const parent = findParentNodeByType(id, "editor");
-    if (!parent) return;
-
-    const file = files.find((f) => f.id === parent.id.toString());
-    if (!file) return;
-
-    const textArea = containerRef.current.querySelector("textarea");
-    if (!textArea) return;
-  }, [data, files, findParentNodeByType]);
+  const handleSend = useCallback(
+    async (type) => {
+      if (!file) return;
+      setLoading(true);
+      const data = await uploadAudio(
+        STTModel,
+        file,
+        apiKey,
+        type,
+        languagesSTT[language],
+        responseType
+      );
+      setLoading(false);
+      setText(data);
+      onDataTextUpdate(id, data);
+    },
+    [file, STTModel, apiKey, language, responseType, onDataTextUpdate, id]
+  );
 
   return (
     <Container
@@ -100,11 +104,71 @@ function SttOutputNode({ id, data }) {
       className="w-[800px] min-h-[520px] overflow-y-scroll flex items-left justify-start overflow-hidden pb-10 relative"
       id={id}
     >
-      <div className="flex items-center justify-between mt-10">
+      <div className="flex items-center justify-between mt-10 flex-col">
         <AudioPlayer file={file} />
+
+        <div className="flex items-center justify-between w-full pt-4">
+          <div>
+            <Dropdown
+              label="Audio Language"
+              name="language"
+              onChange={(evt) => {
+                setLanguage(evt.target.value);
+              }}
+              value={language}
+              options={Object.keys(languagesSTT)}
+            />
+            <Dropdown
+              label="Output Format"
+              name="format"
+              onChange={(evt) => {
+                setResponseType(evt.target.value);
+              }}
+              value={responseType}
+              options={responseFormatSTT}
+            />
+          </div>
+          <div className="flex items-center justify-between space-x-4">
+            <button
+              disabled={!file}
+              className={`border-2 border-gray-500 rounded-md ${
+                !file ? "opacity-50" : ""
+              }`}
+              onClick={() => handleSend("transcriptions")}
+            >
+              <span>Transcribe</span>
+            </button>
+
+            <button
+              disabled={!file}
+              className={`border-2 border-gray-500 rounded-md ${
+                !file ? "opacity-50" : ""
+              }`}
+              onClick={() => handleSend("translations")}
+            >
+              <span>Translate to english</span>
+            </button>
+          </div>
+        </div>
+
+        {loading && <Loading />}
+        {text && (
+          <TextArea
+            id={id}
+            label="Output"
+            value={text}
+            cols={65}
+            name="text"
+            onChange={(evt) => {
+              setText(evt.target.value);
+              onDataTextUpdate(id, evt.target.value);
+            }}
+            autoFocus
+          />
+        )}
+
         <Handle type="source" position={Position.Bottom} />
         <Handle type="target" position={Position.Top} />
-        <div className="flex items-center justify-end absolute top-1 left-1 cursor-pointer"></div>
       </div>
     </Container>
   );
