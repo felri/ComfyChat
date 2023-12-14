@@ -61,9 +61,13 @@ function SystemMessageNode({ id, data }) {
     TTSModel,
     STTModel,
   } = useConfigStore((state) => state);
-  const { createNewInputNode, onDataTextUpdate, temperature, updateStore: updateStoreNode, createNewSTTNode  } = store(
-    useCallback((state) => state, [])
-  );
+  const {
+    createNewInputNode,
+    onDataTextUpdate,
+    temperature,
+    updateStore: updateStoreNode,
+    createNewSTTNode,
+  } = store(useCallback((state) => state, []));
 
   const defaultDropdownValue = () => {
     switch (data.type) {
@@ -121,7 +125,7 @@ function SystemMessageNode({ id, data }) {
   );
 
   return (
-    <Container title="System Message" className="pb-10 w-[600px]" id="2">
+    <Container title="Model Config" className="pb-10 w-[600px]" id="2">
       <Dropdown
         label="Model"
         name="type"
@@ -144,25 +148,30 @@ function SystemMessageNode({ id, data }) {
         .
       </span>
       <div className="h-2" />
-      <TextInput
-        label="Temperature"
-        placeholder="Enter the temperature"
-        onChange={onTemperatureChange}
-        value={temperature}
-        name="temperature"
-        type="number"
-        min="0"
-        max="2"
-      />
-      <TextArea
-        placeholder="Enter your message and examples here"
-        label="Message"
-        rows={7}
-        cols={45}
-        name="text"
-        onChange={onDataUpdate}
-        value={data.text}
-      />
+      {(data.type === "text" || data.type === "stt") && (
+        <TextInput
+          label="Temperature"
+          placeholder="Enter the temperature"
+          onChange={onTemperatureChange}
+          value={temperature}
+          name="temperature"
+          type="number"
+          min="0"
+          max="2"
+        />
+      )}
+
+      {data.type === "text" && (
+        <TextArea
+          placeholder="Enter your message and examples here"
+          label="Message"
+          rows={7}
+          cols={45}
+          name="text"
+          onChange={onDataUpdate}
+          value={data.text}
+        />
+      )}
       <Handle type="source" position={Position.Bottom} />
       <Handle type="target" position={Position.Top} />
       <div className="flex justify-center items-center absolute bottom-0 right-0 w-10 h-10 cursor-pointer">

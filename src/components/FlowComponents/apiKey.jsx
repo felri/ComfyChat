@@ -31,11 +31,11 @@ const buttons = [
     label: "Speech to Text",
     type: "stt",
   },
-  // {
-  //   icon: <AiOutlineSound size={20} />,
-  //   label: "Text to Speech",
-  //   type: "tts",
-  // },
+  {
+    icon: <AiOutlineSound size={20} />,
+    label: "Text to Speech",
+    type: "tts",
+  },
 ];
 
 function IconButton({ icon, onClick, label, type, disabled }) {
@@ -123,7 +123,7 @@ function ApiKeyNode({ id }) {
               icon={button.icon}
               label={button.label}
               onClick={() =>
-                onChooseType(id, button.type, 400)
+                onChooseType(id, button.type, 320)
               }
             />
           ))}

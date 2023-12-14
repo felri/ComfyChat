@@ -9,6 +9,7 @@ import { FaGithub } from "react-icons/fa";
 import ApiKeyNode from "./apiKey";
 import FFMpegNode from "./ffmpegNode";
 import UserInputNode from "./userInput";
+import TTSInput from "./ttsInput";
 import SttOutputNode from "./sttOutput";
 import SystemMessageInput from "./systemInput";
 import DropFilesNode from "./dropFiles";
@@ -45,6 +46,7 @@ const nodeTypes = {
   editor: EditorNode,
   ffmpeg: FFMpegNode,
   sttOutput: SttOutputNode,
+  tts: TTSInput,
 };
 
 function Flow() {

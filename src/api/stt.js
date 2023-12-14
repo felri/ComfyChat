@@ -23,7 +23,8 @@ export async function uploadAudio(
   apiKey,
   endpointType,
   language,
-  responseType
+  responseType,
+  prompt = ""
 ) {
   if (!["transcriptions", "translations"].includes(endpointType)) {
     throw new Error(
@@ -38,6 +39,7 @@ export async function uploadAudio(
   formData.append("model", model);
   formData.append("response_format", responseType);
   formData.append("language", language);
+  formData.append("prompt", prompt);
 
   const url = `https://api.openai.com/v1/audio/${endpointType}`;
 

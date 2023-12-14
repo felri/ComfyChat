@@ -46,7 +46,7 @@ function Editor({ id }) {
           height: 20,
           insertPosition: "beforebegin",
           style: {
-            color: "#2D5B88",
+            color: "#fff",
           },
         },
       },
@@ -183,6 +183,7 @@ function Editor({ id }) {
     return () => {
       if (wavesurferRef.current) {
         wavesurferRef.current.destroy();
+        setRegions([]);
       }
     };
   }, []);

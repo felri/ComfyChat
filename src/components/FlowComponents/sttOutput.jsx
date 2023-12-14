@@ -56,6 +56,7 @@ function SttOutputNode({ id, data }) {
   const [language, setLanguage] = useState("English");
   const [loading, setLoading] = useState(false);
   const [text, setText] = useState(data.text);
+  const [prompt, setPrompt] = useState("");
 
   const { STTModel, apiKey } = useConfigStore((state) => ({
     STTModel: state.STTModel,
@@ -89,13 +90,14 @@ function SttOutputNode({ id, data }) {
         apiKey,
         type,
         languagesSTT[language],
-        responseType
+        responseType,
+        prompt
       );
       setLoading(false);
       setText(data);
       onDataTextUpdate(data, id);
     },
-    [file, STTModel, apiKey, language, responseType, onDataTextUpdate, id]
+    [file, STTModel, apiKey, language, responseType, onDataTextUpdate, id, prompt]
   );
 
   return (
@@ -105,7 +107,20 @@ function SttOutputNode({ id, data }) {
       className="w-[800px] min-h-[520px] overflow-y-scroll flex items-left justify-start overflow-hidden pb-10 relative"
       id={id}
     >
-      <div className="flex items-center justify-between mt-10 flex-col">
+      <div className="flex items-center justify-between flex-col">
+        <TextArea
+          id={id}
+          label="Prompt"
+          placeholder="An optional text to guide the model's style. The prompt should match the audio language. You can add uncommon words for context: ZyntriQix, Digique Plus, CynapseFive, VortiQore V8, EchoNix Array, OrbitalLink Seven, DigiFractal Matrix, PULSE, RAPT, B.R.I.C.K., Q.U.A.R.T.Z., F.L.I.N.T."
+          value={prompt}
+          cols={65}
+          name="prompt"
+          onChange={(evt) => {
+            setPrompt(evt.target.value);
+          }}
+          autoFocus
+        />
+        <div className="m-2" />
         <AudioPlayer file={file} />
 
         <div className="flex items-center justify-between w-full pt-4">
@@ -130,21 +145,6 @@ function SttOutputNode({ id, data }) {
             />
           </div>
           <div className="flex items-start justify-between space-x-4">
-            {/* <Tooltip
-              position="top-full"
-              text="The translations API takes as input the audio file in any of the supported languages and transcribes, if necessary, the audio into English. This differs from our /Transcriptions endpoint since the output is not in the original input language and is instead translated to English text."
-            >
-              <button
-                disabled={!file}
-                className={`border-2 border-gray-500 rounded-md whitespace-nowrap ${
-                  !file ? "opacity-50" : ""
-                }`}
-                onClick={() => handleSend("translations")}
-              >
-                <span>Translate audio to english</span>
-              </button>
-            </Tooltip>
-            */}
             <div>
               <Tooltip
                 position="top-full"
