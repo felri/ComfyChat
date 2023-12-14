@@ -1,5 +1,5 @@
 function base64ToBlob(base64, mimeType) {
-  const byteCharacters = atob(base64.split(',')[1]);
+  const byteCharacters = atob(base64.split(",")[1]);
   const byteArrays = [];
 
   for (let offset = 0; offset < byteCharacters.length; offset += 512) {
@@ -17,45 +17,50 @@ function base64ToBlob(base64, mimeType) {
   return new Blob(byteArrays, { type: mimeType });
 }
 
-export async function uploadAudio(model, file, apiKey, endpointType, language, responseType) {
-  if (!['transcriptions', 'translations'].includes(endpointType)) {
-    throw new Error('Invalid endpointType. Must be "transcriptions" or "translations".');
+export async function uploadAudio(
+  model,
+  file,
+  apiKey,
+  endpointType,
+  language,
+  responseType
+) {
+  if (!["transcriptions", "translations"].includes(endpointType)) {
+    throw new Error(
+      'Invalid endpointType. Must be "transcriptions" or "translations".'
+    );
   }
 
-  const fileBlob = base64ToBlob(file.data, 'audio/mpeg');
+  const fileBlob = base64ToBlob(file.data, "audio/mpeg");
 
   const formData = new FormData();
-  formData.append('file', fileBlob);
-  formData.append('model', model);
-  formData.append('response_format', responseType);
-  formData.append('language', language);
+  formData.append("file", fileBlob);
+  formData.append("model", model);
+  formData.append("response_format", responseType);
+  formData.append("language", language);
 
   const url = `https://api.openai.com/v1/audio/${endpointType}`;
 
   try {
     const response = await fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey}`,
       },
-      body: formData
+      body: formData,
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`HTTP Error Response: ${response.status} ${response.statusText} ${errorText}`);
+      throw new Error(
+        `HTTP Error Response: ${response.status} ${response.statusText} ${errorText}`
+      );
     }
 
-    if (responseType === 'text') {
-      const data = await response.text();
-      console.log('Data:', data);
-      return data;
-    }
-    const data = await response.json();
-    console.log('Data:', data);
+    const data = await response.text();
     return data;
   } catch (error) {
-    console.error('Error uploading file:', error.message);
+    console.error("Error uploading file:", error.message);
     throw error;
   }
 }

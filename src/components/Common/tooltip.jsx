@@ -5,7 +5,7 @@ const Tooltip = ({ children, text, position = "left-full"}) => {
   const [showTooltip, setShowTooltip] = useState(false);
 
   return (
-    <div className="relative flex items-center whitespace-nowrap">
+    <div className="relative flex items-center">
       <div
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}

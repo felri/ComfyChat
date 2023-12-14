@@ -45,9 +45,7 @@ export const initialLayouted = {
 
 export const responseFormatSTT = [
   "text", 
-  "json", 
   "srt", 
-  "verbose_json",
   "vtt"
 ]
 

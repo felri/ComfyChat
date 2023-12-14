@@ -13,11 +13,11 @@ function Dropdown({
   }, []);
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full w-full text-center">
       <label>{label}</label>
       <select
         onChange={handleChange}
-        className="nodrag w-full"
+        className="nodrag w-full text-center"
         value={value}
         name={name}
       >

@@ -16,6 +16,7 @@ import Dropdown from "../Common/dropdown";
 import { responseFormatSTT, languagesSTT } from "../../store/constants";
 import Loading from "../Common/loading";
 import "highlight.js/styles/github-dark.css"; // Or any other style you prefer
+import Tooltip from "../Common/tooltip";
 
 const AudioPlayer = ({ file }) => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -92,7 +93,7 @@ function SttOutputNode({ id, data }) {
       );
       setLoading(false);
       setText(data);
-      onDataTextUpdate(id, data);
+      onDataTextUpdate(data, id);
     },
     [file, STTModel, apiKey, language, responseType, onDataTextUpdate, id]
   );
@@ -110,7 +111,7 @@ function SttOutputNode({ id, data }) {
         <div className="flex items-center justify-between w-full pt-4">
           <div>
             <Dropdown
-              label="Audio Language"
+              label="Translate to"
               name="language"
               onChange={(evt) => {
                 setLanguage(evt.target.value);
@@ -128,26 +129,38 @@ function SttOutputNode({ id, data }) {
               options={responseFormatSTT}
             />
           </div>
-          <div className="flex items-center justify-between space-x-4">
-            <button
-              disabled={!file}
-              className={`border-2 border-gray-500 rounded-md ${
-                !file ? "opacity-50" : ""
-              }`}
-              onClick={() => handleSend("transcriptions")}
+          <div className="flex items-start justify-between space-x-4">
+            {/* <Tooltip
+              position="top-full"
+              text="The translations API takes as input the audio file in any of the supported languages and transcribes, if necessary, the audio into English. This differs from our /Transcriptions endpoint since the output is not in the original input language and is instead translated to English text."
             >
-              <span>Transcribe</span>
-            </button>
-
-            <button
-              disabled={!file}
-              className={`border-2 border-gray-500 rounded-md ${
-                !file ? "opacity-50" : ""
-              }`}
-              onClick={() => handleSend("translations")}
-            >
-              <span>Translate to english</span>
-            </button>
+              <button
+                disabled={!file}
+                className={`border-2 border-gray-500 rounded-md whitespace-nowrap ${
+                  !file ? "opacity-50" : ""
+                }`}
+                onClick={() => handleSend("translations")}
+              >
+                <span>Translate audio to english</span>
+              </button>
+            </Tooltip>
+            */}
+            <div>
+              <Tooltip
+                position="top-full"
+                text="The transcriptions API takes as input the audio file you want to transcribe and the desired output file format for the transcription of the audio."
+              >
+                <button
+                  disabled={!file}
+                  className={`border-2 border-gray-500 rounded-md whitespace-nowrap ${
+                    !file ? "opacity-50" : ""
+                  }`}
+                  onClick={() => handleSend("transcriptions")}
+                >
+                  <span>Transcribe</span>
+                </button>
+              </Tooltip>
+            </div>
           </div>
         </div>
 
