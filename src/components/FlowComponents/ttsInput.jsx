@@ -4,15 +4,30 @@ import { Handle, Position } from "reactflow";
 import Container from "../Common/container";
 import TextArea from "../Common/textarea";
 import { IoMdSend } from "react-icons/io";
-import { HiOutlineTrash } from "react-icons/hi2";
 import PropTypes from "prop-types";
+import { voices, languages } from "../../store/constants";
+import Dropdown from "../Common/dropdown";
+import TextInput from "../Common/text";
 
 function TTSInput({ id, data }) {
   const nodeRef = useRef(null);
   const store = storeManager.getSelectedStore();
-  const [openAIInstance] = useConfigStore((state) => [state.openAIInstance]);
-  const { onDataTextUpdate, onUserInputSend, deleteUserNode } = store(
-    useCallback((state) => state, [])
+  const { openAIInstance, voice, updateStore, language, speed } = useConfigStore(
+    ({ openAIInstance, voice, updateStore, language, speed }) => ({
+      openAIInstance,
+      voice,
+      updateStore,
+      speed,
+      language,
+    })
+  );
+  const { onDataTextUpdate, onUserInputSend } = store(
+    useCallback(({ onDataTextUpdate, onUserInputSend }) => {
+      return {
+        onDataTextUpdate,
+        onUserInputSend,
+      };
+    }, [])
   );
 
   const [text, setText] = useState(data.text);
@@ -49,14 +64,7 @@ function TTSInput({ id, data }) {
   };
 
   const placeHolderText = openAIInstance
-    ? `Enter to send
-Shift + Enter new line
-Space + Scroll to zoom
-Control + Space to center
-Shift + Drag to select
-Backspace to delete selected
-Shift + N to create new chat
-`
+    ? `The text to be spoken`
     : "Please add an API key";
 
   return (
@@ -74,6 +82,62 @@ Shift + N to create new chat
         onKeyDown={onEnter}
         autoFocus={true}
       />
+      <div className="flex space-x-4">
+        <div className="w-1/3">
+          <Dropdown
+            onClick={() => {}}
+            label="Voice"
+            type="text"
+            disabled={!openAIInstance}
+            options={voices}
+            name="voice"
+            value={voice}
+            onChange={(e) => {
+              updateStore("voice", e.target.value);
+            }}
+          />
+          <span className="text-xs text-gray-400">
+            You can hear the voices{" "}
+            <a
+              href="https://platform.openai.com/docs/guides/text-to-speech/voice-options"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500"
+            >
+              here
+            </a>
+            .
+          </span>
+        </div>
+        <div className="w-1/3">
+          <Dropdown
+            onClick={() => {}}
+            label="Output Language"
+            type="text"
+            disabled={!openAIInstance}
+            options={Object.keys(languages)}
+            name="language"
+            value={language}
+            onChange={(e) => {
+              updateStore("language", e.target.value);
+            }}
+          />
+        </div>
+        <div className="w-1/3">
+          <TextInput
+            label="Speed (0.25-4.0)"
+            onChange={(e) => {
+              updateStore(e.target.name, e.target.value);
+            }}
+            value={speed}
+            name="speed"
+            type="number"
+            min="0.25"
+            max="4"
+          />
+        </div>
+      </div>
+
       <Handle type="source" position={Position.Bottom} />
       <Handle type="target" position={Position.Top} />
 

@@ -9,7 +9,7 @@ import {
   getStoredStoreIds,
 } from "./utils";
 import OpenAI from "openai";
-import { initialLayouted } from "./constants";
+import { initialLayouted, voices } from "./constants";
 import { ffmpegLoad, processMedia } from "../utils/ffmpeg";
 import {
   visionModels,
@@ -321,6 +321,9 @@ const useConfigStore = create(
       imageModel: imageModels[0],
       TTSModel: ttsModels[0],
       STTModel: sttModels[0],
+      voice: voices[0],
+      language: "English",
+      speed: 1,
       setSelectedStoreId: (id) => set({ selectedStoreId: id }),
       setApiKey: (key) => set({ apiKey: key }),
       setLockViewInOutput: (lock) => set({ lockViewInOutput: lock }),
@@ -349,6 +352,9 @@ const useConfigStore = create(
               "imageModel",
               "TTSModel",
               "STTModel",
+              "voice",
+              "language",
+              "speed",
             ].includes(key)
           )
         ),

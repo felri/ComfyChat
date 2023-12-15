@@ -49,7 +49,7 @@ export const responseFormatSTT = [
   "vtt"
 ]
 
-export const languagesSTT = {
+export const languages = {
   "Afrikaans": "af",
   "Arabic": "ar",
   "Armenian": "hy",
@@ -108,3 +108,12 @@ export const languagesSTT = {
   "Vietnamese": "vi",
   "Welsh": "cy"
 };
+
+export const voices = [
+  "alloy", 
+  "echo", 
+  "fable", 
+  "onyx", 
+  "nova", 
+  "shimmer"
+]

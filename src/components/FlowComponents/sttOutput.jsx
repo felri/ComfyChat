@@ -13,7 +13,7 @@ import { IoIosRefresh } from "react-icons/io";
 import { CiEdit } from "react-icons/ci";
 import { uploadAudio } from "../../api/stt";
 import Dropdown from "../Common/dropdown";
-import { responseFormatSTT, languagesSTT } from "../../store/constants";
+import { responseFormatSTT, languages } from "../../store/constants";
 import Loading from "../Common/loading";
 import "highlight.js/styles/github-dark.css"; // Or any other style you prefer
 import Tooltip from "../Common/tooltip";
@@ -89,7 +89,7 @@ function SttOutputNode({ id, data }) {
         file,
         apiKey,
         type,
-        languagesSTT[language],
+        languages[language],
         responseType,
         prompt
       );
@@ -132,7 +132,7 @@ function SttOutputNode({ id, data }) {
                 setLanguage(evt.target.value);
               }}
               value={language}
-              options={Object.keys(languagesSTT)}
+              options={Object.keys(languages)}
             />
             <Dropdown
               label="Output Format"

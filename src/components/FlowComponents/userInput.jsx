@@ -4,14 +4,13 @@ import { Handle, Position } from "reactflow";
 import Container from "../Common/container";
 import TextArea from "../Common/textarea";
 import { IoMdSend } from "react-icons/io";
-import { HiOutlineTrash } from "react-icons/hi2";
 import PropTypes from "prop-types";
 
 function UserInputNode({ id, data }) {
   const nodeRef = useRef(null);
   const store = storeManager.getSelectedStore();
   const [openAIInstance] = useConfigStore((state) => [state.openAIInstance]);
-  const { onDataTextUpdate, onUserInputSend, deleteUserNode } = store(
+  const { onDataTextUpdate, onUserInputSend } = store(
     useCallback((state) => state, [])
   );
 
