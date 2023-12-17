@@ -48,7 +48,7 @@ function FFmpegNode({ id, data, type }) {
 
   const mediaParentNode = useMemo(() => {
     return findParentNodeByType(id, "editor");
-  }, [id]);
+  }, [findParentNodeByType, id]);
 
   useEffect(() => {
     if (!ffmpeg) {
@@ -73,16 +73,16 @@ function FFmpegNode({ id, data, type }) {
         console.log("file not found");
       }
     },
-    [data.end, data.start, id, mediaParentNode.id]
+    [createSTTOutputNode, cutAudio, data.end, data.start, id]
   );
 
   useEffect(() => {
     if (!mediaParentNode) return;
-    const file = files.find((f) => f.id === mediaParentNode.id.toString());
+    const file = files.find((f) => f.id === mediaParentNode?.id.toString());
     if (files && file) {
       handleCutAudio(file);
     }
-  }, [id, mediaParentNode.id]);
+  }, [id, mediaParentNode]);
 
   return (
     <Container title="FFmpeg" innerRef={nodeRef} id={id} className="w-[500px]">

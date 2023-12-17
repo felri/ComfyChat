@@ -82,93 +82,54 @@ const createStore = (id) =>
             return acc + curr.text.split(" ").length;
           }, 0);
         },
-        onChooseType: (id, type, parentHeight = 250) => {
+
+        findParentNodeByType: (id, type) => {
+          const node = get().nodes.find((node) => node.id === id);
+          const edges = get().edges.filter((edge) => edge.target === id);
+
+          if (node?.type === type) {
+            return node;
+          }
+
+          if (edges?.length === 0) {
+            return null;
+          }
+
+          return get().findParentNodeByType(edges[0].source, type);
+        },
+        findChildNodeByType: (id, type) => {
+          const node = get().nodes.find((node) => node.id === id);
+          const edges = get().edges.filter((edge) => edge.source === id);
+
+          if (node?.type === type) {
+            return node;
+          }
+
+          if (edges.length === 0) {
+            return null;
+          }
+
+          return get().findChildNodeByType(edges[0].target, type);
+        },
+        createAndUpdateNode: (id, parentHeight, type, extraData = {}) => {
           const layouted = createNewNode(
             get().nodes,
             get().edges,
             id,
-            250,
-            "systemMessage",
-            { text: "You are an AI Assistant talking with a human.", type }
-          );
-          const lastNode = layouted.nodes[layouted.nodes.length - 1];
-
-          // create a new input node and edge
-          const inputLayouted = createNewNode(
-            layouted.nodes,
-            layouted.edges,
-            lastNode.id,
             parentHeight,
             type,
-            { type }
-          );
-
-          set({
-            nodes: [...inputLayouted.nodes],
-            edges: [...inputLayouted.edges],
-          });
-        },
-        onUserInputSend: (
-          id,
-          parentHeight,
-          type = "chatOutput",
-          childType = "text"
-        ) => {
-          // create a new output node and edge
-          const layouted = createNewNode(
-            get().nodes,
-            get().edges,
-            id,
-            parentHeight,
-            type
-          );
-          const lastNode = layouted.nodes[layouted.nodes.length - 1];
-
-          // create a new input node and edge
-          const inputLayouted = createNewNode(
-            layouted.nodes,
-            layouted.edges,
-            lastNode.id,
-            parentHeight + 125,
-            childType
-          );
-
-          set({
-            nodes: [...inputLayouted.nodes],
-            edges: [...inputLayouted.edges],
-          });
-        },
-        createNewSTTNode: (id, parentHeight) => {
-          const layouted = createNewNode(
-            get().nodes,
-            get().edges,
-            id,
-            parentHeight,
-            "stt",
-            { type: "stt" }
+            extraData
           );
 
           set({
             nodes: [...layouted.nodes],
             edges: [...layouted.edges],
           });
-        },
-        createNewInputNode: (id, parentHeigth = 100) => {
-          const layouted = createNewNode(
-            get().nodes,
-            get().edges,
-            id,
-            parentHeigth,
-            "text"
-          );
 
-          set({
-            nodes: layouted.nodes,
-            edges: layouted.edges,
-          });
+          return layouted;
         },
-        updateChildrenPosition: (id, diff) => {
-          const layouted = get().nodes.map((node) => {
+        updateNodePosition: (id, diff) => {
+          const nodes = get().nodes.map((node) => {
             if (node.id === id) {
               return {
                 ...node,
@@ -180,20 +141,49 @@ const createStore = (id) =>
             }
             return node;
           });
-          set({ nodes: layouted });
+
+          set({ nodes });
+        },
+        // Update the specific functions to use the new, more generic ones.
+        onChooseType: (id, type, parentHeight = 250) => {
+          const { nodes } = get().createAndUpdateNode(id, 250, "systemMessage", {
+            text: "You are an AI Assistant talking with a human.",
+            type,
+          });
+          const lastNode = nodes[nodes.length - 1];
+          get().createAndUpdateNode(lastNode.id, parentHeight, type, { type });
+        },
+        onUserInputSend: (
+          id,
+          parentHeight,
+          type = "chatOutput",
+          childType = "text"
+        ) => {
+          const { nodes } = get().createAndUpdateNode(id, parentHeight, type);
+          const lastNode = nodes[nodes.length - 1];
+          get().createAndUpdateNode(lastNode.id, parentHeight + 125, childType);
+        },
+        createNewSTTNode: (id, parentHeight) => {
+          get().createAndUpdateNode(id, parentHeight, "stt", { type: "stt" });
+        },
+        createNewInputNode: (id, parentHeight = 100) => {
+          get().createAndUpdateNode(id, parentHeight, "text");
+        },
+        updateChildrenPosition: (id, diff) => {
+          get().updateNodePosition(id, diff);
+        },
+        onAudioEditorSend: (id, start, end, type) => {
+          get().createAndUpdateNode(id, 200, "ffmpeg", { start, end, type });
+        },
+        createSTTOutputNode: (id) => {
+          get().createAndUpdateNode(id, 200, "sttOutput");
         },
         onAudioDrop: (id, file, parentHeight) => {
-          const layouted = createNewNode(
-            get().nodes,
-            get().edges,
-            id,
-            parentHeight,
-            "editor",
-            { modelType: "stt" }
-          );
+          const { nodes } = get().createAndUpdateNode(id, parentHeight, "editor", {
+            modelType: "stt",
+          });
 
-          console.log(file);
-          const lastNode = layouted.nodes[layouted.nodes.length - 1];
+          const lastNode = nodes[nodes.length - 1];
           useFileStore.setState({
             files: [
               ...useFileStore.getState().files,
@@ -203,68 +193,6 @@ const createStore = (id) =>
                 id: lastNode.id,
               },
             ],
-          });
-
-          set({
-            nodes: [...layouted.nodes],
-            edges: [...layouted.edges],
-          });
-        },
-        findParentNodeByType: (id, type) => {
-          const node = get().nodes.find((node) => node.id === id);
-          const edges = get().edges.filter((edge) => edge.target === id);
-
-          if (node.type === type) {
-            return node;
-          }
-
-          if (edges.length === 0) {
-            return null;
-          }
-
-          return get().findParentNodeByType(edges[0].source, type);
-        },
-        findChildNodeByType: (id, type) => {
-          const node = get().nodes.find((node) => node.id === id);
-          const edges = get().edges.filter((edge) => edge.source === id);
-
-          if (node.type === type) {
-            return node;
-          }
-
-          if (edges.length === 0) {
-            return null;
-          }
-
-          return get().findChildNodeByType(edges[0].target, type);
-        },
-        onAudioEditorSend: (id, start, end, type) => {
-          const layouted = createNewNode(
-            get().nodes,
-            get().edges,
-            id,
-            200,
-            "ffmpeg",
-            { start, end, type }
-          );
-
-          set({
-            nodes: [...layouted.nodes],
-            edges: [...layouted.edges],
-          });
-        },
-        createSTTOutputNode: (id) => {
-          const layouted = createNewNode(
-            get().nodes,
-            get().edges,
-            id,
-            200,
-            "sttOutput"
-          );
-
-          set({
-            nodes: [...layouted.nodes],
-            edges: [...layouted.edges],
           });
         },
       }),
