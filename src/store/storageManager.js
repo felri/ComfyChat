@@ -153,7 +153,7 @@ const createStore = (id) =>
             edges: [...layouted.edges],
           });
         },
-        createNewInputNode: (id, parentHeigth) => {
+        createNewInputNode: (id, parentHeigth = 100) => {
           const layouted = createNewNode(
             get().nodes,
             get().edges,

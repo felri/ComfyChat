@@ -17,7 +17,8 @@ function UserInputNode({ id, data }) {
         onDataTextUpdate,
         onUserInputSend,
         countWordsInHistory,
-      })
+      }),
+      []
     )
   );
 

@@ -91,14 +91,14 @@ function SystemMessageNode({ id, data }) {
     (e) => {
       updateStore(getModelType(data.type), e.target.value);
     },
-    [updateStore]
+    [data.type, updateStore]
   );
 
   const onTemperatureChange = useCallback(
     (e) => {
       updateStoreNode(e.target.name, e.target.value);
     },
-    [updateStore]
+    [updateStoreNode]
   );
 
   const onDataUpdate = useCallback(
@@ -112,17 +112,17 @@ function SystemMessageNode({ id, data }) {
     (type) => {
       switch (type) {
         case "text":
-          createNewInputNode("2");
+          createNewInputNode("2", 200);
           break;
         case "stt":
-          createNewSTTNode("2");
+          createNewSTTNode("2", 200);
           break;
         default:
-          createNewInputNode("2");
+          createNewInputNode("2", 200);
           break;
       }
     },
-    [createNewInputNode]
+    [createNewInputNode, createNewSTTNode]
   );
 
   return (
