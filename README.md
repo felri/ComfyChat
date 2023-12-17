@@ -2,9 +2,7 @@
 
 ## [Demo](https://comfychat.space/)
 
-
-https://github.com/felri/ComfyChat/assets/56592364/83a84cfb-d1e0-4930-91d8-7997811d6605
-
+https://github.com/felri/ComfyChat/assets/56592364/115127d6-a0ef-466a-a80b-148996db690f
 
 ### Run locally
 
