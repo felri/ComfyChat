@@ -10,12 +10,18 @@ function UserInputNode({ id, data }) {
   const nodeRef = useRef(null);
   const store = storeManager.getSelectedStore();
   const [openAIInstance] = useConfigStore((state) => [state.openAIInstance]);
-  const { onDataTextUpdate, onUserInputSend } = store(
-    useCallback((state) => state, [])
+  const { onDataTextUpdate, onUserInputSend, countWordsInHistory } = store(
+    useCallback(
+      ({ onDataTextUpdate, onUserInputSend, countWordsInHistory }) => ({
+        onDataTextUpdate,
+        onUserInputSend,
+        countWordsInHistory,
+      })
+    )
   );
 
   const [text, setText] = useState(data.text);
-  const [wordCount, setWordCount] = useState(0);
+  const [wordCount, setWordCount] = useState(countWordsInHistory);
 
   const onChange = (e) => {
     setText(e.target.value);

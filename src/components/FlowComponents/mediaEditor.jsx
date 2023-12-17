@@ -183,7 +183,10 @@ function Editor({ id }) {
     return () => {
       if (wavesurferRef.current) {
         wavesurferRef.current.destroy();
-        setRegions([]);
+        wavesurferRef.current = null;
+        if (window) {
+          window.surferidze = null;
+        }
       }
     };
   }, []);

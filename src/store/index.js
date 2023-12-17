@@ -131,6 +131,12 @@ const createStore = (id) =>
         getHistory: (id) => {
           return getMessageHistory(id, get().nodes, get().edges);
         },
+        countWordsInHistory: (id) => {
+          const history = get().getHistory(id);
+          return history.reduce((acc, curr) => {
+            return acc + curr.text.split(" ").length;
+          }, 0);
+        },
         onChooseType: (id, type, parentHeight = 250) => {
           const layouted = createNewNode(
             get().nodes,
