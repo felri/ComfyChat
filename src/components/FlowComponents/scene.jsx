@@ -36,7 +36,6 @@ const selector = (state) => ({
   deleteChatNode: state.deleteChatNode,
   resetStore: state.resetStore,
   cleanEmptyEdges: state.cleanEmptyEdges,
-
 });
 
 const nodeTypes = {
@@ -149,6 +148,10 @@ function Flow() {
       if (e.shiftKey && e.code === "KeyN") {
         createNewChatPage();
       }
+
+      return () => {
+        window.removeEventListener("keydown", handleKeyPress);
+      };
     },
     [getViewport, nodes, setViewport]
   );
@@ -200,16 +203,16 @@ function Flow() {
               <p className="text-white text-sm">ComfyChat</p>
             </div>
             <div className="flex justify-center items-start space-y-2 w-full h-1 flex-col">
-            <a
-              href="https://github.com/felri/ComfyChat"
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center text-white decoration-none hover:text-white"
-            >
-              <FaGithub className="mr-2 text-sm" />
-              <p className="text-white text-sm hover:underline">Github</p>
-            </a>
-          </div>
+              <a
+                href="https://github.com/felri/ComfyChat"
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center text-white decoration-none hover:text-white"
+              >
+                <FaGithub className="mr-2 text-sm" />
+                <p className="text-white text-sm hover:underline">Github</p>
+              </a>
+            </div>
           </div>
         </Panel>
 

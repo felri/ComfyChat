@@ -85,7 +85,7 @@ function FFmpegNode({ id, data, type }) {
   }, [id, mediaParentNode]);
 
   return (
-    <Container title="FFmpeg" innerRef={nodeRef} id={id} className="w-[500px]">
+    <Container title="Conversion" innerRef={nodeRef} id={id} className="w-[500px]">
       <div className="mt-4 flex items-center justify-center h-full w-full py-4">
         <Handle type="source" position={Position.Bottom} />
         <Handle type="target" position={Position.Top} />

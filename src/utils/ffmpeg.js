@@ -38,6 +38,22 @@ export const ffmpegLoad = async () => {
   return ffmpeg;
 };
 
+const cleanUp = async (ffmpeg, fileName, outputFileName) => {
+  try {
+    await ffmpeg.deleteFile(fileName);
+  } catch (cleanupError) {
+    console.log("Error during cleanup:", cleanupError);
+  }
+
+  try {
+    await ffmpeg.deleteFile(outputFileName);
+  } catch (cleanupError) {
+    console.log("Error during cleanup:", cleanupError);
+  }
+
+  return;
+};
+
 export const processMedia = async (
   ffmpeg,
   file,
@@ -48,18 +64,9 @@ export const processMedia = async (
   const fileType = file.name.split(".");
   const fileName = "input." + fileType[fileType.length - 1];
   const outputFileName = "output.mp3";
+  let destroyFFmpeg = false;
 
-  try {
-    await ffmpeg.deleteFile(fileName);
-  } catch (cleanupError) {
-    console.log("Error during cleanup:", cleanupError);
-  }
-
-  try {
-    await ffmpeg.deleteFile("output.mp3");
-  } catch (cleanupError) {
-    console.log("Error during cleanup:", cleanupError);
-  }
+  await cleanUp(ffmpeg, fileName, outputFileName);
 
   try {
     await ffmpeg.writeFile(fileName, await fetchFile(file.data));
@@ -70,6 +77,7 @@ export const processMedia = async (
     try {
       ffmpeg = await ffmpegLoad();
       await ffmpeg.writeFile(fileName, await fetchFile(file.data));
+      destroyFFmpeg = true;
     } catch (retryError) {
       console.error("Error during retry writeFile:", retryError);
     }
@@ -89,9 +97,7 @@ export const processMedia = async (
     await ffmpeg.exec(ffmpegCommand);
     const data = await ffmpeg.readFile(outputFileName);
 
-    // Cleanup
-    await ffmpeg.deleteFile(fileName);
-    await ffmpeg.deleteFile(outputFileName);
+    await cleanUp(ffmpeg, fileName, outputFileName);
 
     // Convert ArrayBuffer to base64
     const base64String = arrayBufferToBase64(data.buffer);
@@ -103,10 +109,15 @@ export const processMedia = async (
 
     // Cleanup even in case of error
     try {
-      await ffmpeg.deleteFile(fileName);
-      await ffmpeg.deleteFile(outputFileName);
+      await cleanUp(ffmpeg, fileName, outputFileName);
     } catch (cleanupError) {
       console.error("Error during cleanup:", cleanupError);
     }
+  }
+
+  // if for some reason we had to reload ffmpeg, destroy it after use
+  if (destroyFFmpeg) {
+    ffmpeg.destroy();
+    ffmpeg = null;
   }
 };
