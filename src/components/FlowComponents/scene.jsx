@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import ReactFlow, { useReactFlow, Background, Panel } from "reactflow";
-import { storeManager, useConfigStore } from "../../store";
+import { storeManager } from "../../store/storageManager";
+import { useConfigStore } from "../../store/useConfigStore";
 import { HiOutlineTrash } from "react-icons/hi2";
 import "reactflow/dist/style.css";
 import Tooltip from "../Common/tooltip";

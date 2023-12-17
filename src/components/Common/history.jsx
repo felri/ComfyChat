@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { BsChatSquareDots } from "react-icons/bs";
 import PropTypes from "prop-types";
-import { getStoredStoreIds } from "../../store/utils";
+import { getStoredStoreIds } from "../../store/utils/helpers";
 import { HiOutlineTrash } from "react-icons/hi2";
-import { storeManager } from "../../store";
+import { storeManager } from "../../store/storageManager";
 import Tooltip from "../Common/tooltip";
 
 const Item = ({ id, updateScene, selected, onDelete }) => {

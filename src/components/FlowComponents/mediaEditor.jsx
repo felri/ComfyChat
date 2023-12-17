@@ -14,7 +14,8 @@ import {
 } from "react-icons/ci";
 import { RxSpaceBetweenHorizontally } from "react-icons/rx";
 import Tooltip from "../Common/tooltip";
-import { useFileStore, storeManager } from "../../store";
+import { storeManager } from "../../store/storageManager";
+import { useFileStore } from "../../store/useFileStore";
 
 function generateNum(min, max) {
   return Math.random() * (max - min + 1) + min;

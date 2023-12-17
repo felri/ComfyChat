@@ -1,12 +1,14 @@
 import { useState, useCallback, useRef, useMemo } from "react";
-import { storeManager, useConfigStore, useFileStore } from "../../store";
+import { storeManager } from "../../store/storageManager";
+import { useConfigStore } from "../../store/useConfigStore";
+import { useFileStore } from "../../store/useFileStore";
 import { Handle, Position } from "reactflow";
 import Container from "../Common/container";
 import TextArea from "../Common/textarea";
 import PropTypes from "prop-types";
 import { uploadAudio } from "../../api/stt";
 import Dropdown from "../Common/dropdown";
-import { responseFormatSTT, languages } from "../../store/constants";
+import { responseFormatSTT, languages } from "../../store/utils/constants";
 import Loading from "../Common/loading";
 import "highlight.js/styles/github-dark.css"; // Or any other style you prefer
 import Tooltip from "../Common/tooltip";

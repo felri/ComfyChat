@@ -2,7 +2,8 @@ import { useCallback, useRef, useEffect, useState, useMemo } from "react";
 import { FaFileAudio } from "react-icons/fa6";
 import PropTypes from "prop-types";
 import Container from "../Common/container";
-import { useFileStore, storeManager } from "../../store";
+import { storeManager } from "../../store/storageManager";
+import { useFileStore } from "../../store/useFileStore";
 import { Handle, Position } from "reactflow";
 
 const steps = {

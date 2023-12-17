@@ -3,7 +3,7 @@ import { useDropzone } from "react-dropzone";
 import { FaFileAudio } from "react-icons/fa6";
 import PropTypes from "prop-types";
 import Container from "../Common/container";
-import { storeManager } from "../../store";
+import { storeManager } from "../../store/storageManager";
 import { Handle, Position } from "reactflow";
 
 function Dropzone({ id, disable }) {

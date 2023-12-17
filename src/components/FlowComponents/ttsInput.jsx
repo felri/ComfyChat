@@ -1,11 +1,12 @@
 import { useCallback, useState, useRef } from "react";
-import { storeManager, useConfigStore } from "../../store";
+import { storeManager } from "../../store/storageManager";
+import { useConfigStore } from "../../store/useConfigStore";
 import { Handle, Position } from "reactflow";
 import Container from "../Common/container";
 import TextArea from "../Common/textarea";
 import Tooltip from "../Common/tooltip";
 import PropTypes from "prop-types";
-import { voices, languages } from "../../store/constants";
+import { voices, languages } from "../../store/utils/constants";
 import Dropdown from "../Common/dropdown";
 import TextInput from "../Common/text";
 

@@ -7,65 +7,10 @@ import {
   createNewNode,
   generateStoreId,
   getStoredStoreIds,
-} from "./utils";
-import OpenAI from "openai";
-import { initialLayouted, voices } from "./constants";
-import { ffmpegLoad, processMedia } from "../utils/ffmpeg";
-import {
-  visionModels,
-  textModels,
-  imageModels,
-  ttsModels,
-  sttModels,
-} from "./defaultModels";
-
-function createModelInstance(apiKey) {
-  try {
-    return new OpenAI({
-      apiKey: apiKey,
-      dangerouslyAllowBrowser: true,
-    });
-  } catch (e) {
-    console.log(e);
-    return null;
-  }
-}
-
-const useFileStore = create((set, get) => ({
-  files: [],
-  ffmpeg: null,
-  setFiles: (files) => set({ files }),
-  addFile: (file) => set((state) => ({ files: [...state.files, file] })),
-  removeFile: (file) =>
-    set((state) => ({
-      files: state.files.filter((f) => f.name !== file.name),
-    })),
-  removeAllFiles: () => set({ files: [] }),
-  setFFmpeg: async () => {
-    const ffmpeg = await ffmpegLoad();
-    set({ ffmpeg });
-  },
-  cutAudio: async (id, file, start, end) => {
-    const data = await processMedia(
-      useFileStore.getState().ffmpeg,
-      file,
-      "cutAudio",
-      start,
-      end
-    );
-
-    const newFiles = [
-      ...get().files,
-      {
-        name: file.name,
-        data,
-        id,
-      },
-    ];
-
-    set({ files: newFiles });
-  },
-}));
+} from "./utils/helpers";
+import { initialLayouted } from "./utils/constants";
+import { useFileStore } from "./useFileStore";
+import { useConfigStore } from "./useConfigStore";
 
 // Factory function to create a new store
 const createStore = (id) =>
@@ -335,59 +280,6 @@ const createStore = (id) =>
     )
   );
 
-const useConfigStore = create(
-  persist(
-    (set) => ({
-      selectedStoreId: getStoredStoreIds()[0],
-      apiKey: "",
-      openAIInstance: null,
-      lockViewInOutput: true,
-      textModel: textModels[0],
-      visionModel: visionModels[0],
-      imageModel: imageModels[0],
-      TTSModel: ttsModels[0],
-      STTModel: sttModels[0],
-      voice: voices[0],
-      language: "English",
-      speed: 1,
-      setSelectedStoreId: (id) => set({ selectedStoreId: id }),
-      setApiKey: (key) => set({ apiKey: key }),
-      setLockViewInOutput: (lock) => set({ lockViewInOutput: lock }),
-      updateStore: (name, value) => {
-        set({
-          [name]: value,
-        });
-      },
-      createOpenAIInstance: () => {
-        set((state) => ({
-          openAIInstance: createModelInstance(state.apiKey),
-        }));
-      },
-    }),
-    {
-      name: "config-store",
-      partialize: (state) =>
-        Object.fromEntries(
-          Object.entries(state).filter(([key]) =>
-            [
-              "selectedStoreId",
-              "apiKey",
-              "lockViewInOutput",
-              "textModel",
-              "visionModel",
-              "imageModel",
-              "TTSModel",
-              "STTModel",
-              "voice",
-              "language",
-              "speed",
-            ].includes(key)
-          )
-        ),
-    }
-  )
-);
-
 const storeManager = {
   stores: {},
 
@@ -439,4 +331,4 @@ const storeManager = {
 
 storeManager.initializeStores();
 
-export { storeManager, useConfigStore, useFileStore };
+export { storeManager };

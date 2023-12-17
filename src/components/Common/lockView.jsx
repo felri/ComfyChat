@@ -1,4 +1,4 @@
-import { useConfigStore } from "../../store";
+import { useConfigStore } from "../../store/useConfigStore";
 import { CiLock, CiUnlock } from "react-icons/ci";
 
 function LockView() {

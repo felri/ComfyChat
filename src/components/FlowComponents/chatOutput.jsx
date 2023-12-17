@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { storeManager, useConfigStore } from "../../store";
+import { storeManager } from "../../store/storageManager";
+import { useConfigStore } from "../../store/useConfigStore";
 import { Handle, Position } from "reactflow";
 import { useReactFlow } from "reactflow";
 import Container from "../Common/container";

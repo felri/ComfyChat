@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import { useOnSelectionChange } from "reactflow";
-import { storeManager } from "../../store";
+import { storeManager } from "../../store/storageManager";
 import { HiOutlineTrash } from "react-icons/hi2";
 
 function Container({
