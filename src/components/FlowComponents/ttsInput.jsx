@@ -1,9 +1,9 @@
-import { useCallback, useState, useRef, useEffect } from "react";
+import { useCallback, useState, useRef } from "react";
 import { storeManager, useConfigStore } from "../../store";
 import { Handle, Position } from "reactflow";
 import Container from "../Common/container";
 import TextArea from "../Common/textarea";
-import { IoMdSend } from "react-icons/io";
+import Tooltip from "../Common/tooltip";
 import PropTypes from "prop-types";
 import { voices, languages } from "../../store/constants";
 import Dropdown from "../Common/dropdown";
@@ -12,15 +12,16 @@ import TextInput from "../Common/text";
 function TTSInput({ id, data }) {
   const nodeRef = useRef(null);
   const store = storeManager.getSelectedStore();
-  const { openAIInstance, voice, updateStore, language, speed } = useConfigStore(
-    ({ openAIInstance, voice, updateStore, language, speed }) => ({
-      openAIInstance,
-      voice,
-      updateStore,
-      speed,
-      language,
-    })
-  );
+  const { openAIInstance, voice, updateStore, language, speed } =
+    useConfigStore(
+      ({ openAIInstance, voice, updateStore, language, speed }) => ({
+        openAIInstance,
+        voice,
+        updateStore,
+        speed,
+        language,
+      })
+    );
   const { onDataTextUpdate, onUserInputSend } = store(
     useCallback(({ onDataTextUpdate, onUserInputSend }) => {
       return {
@@ -31,24 +32,11 @@ function TTSInput({ id, data }) {
   );
 
   const [text, setText] = useState(data.text);
-  const [wordCount, setWordCount] = useState(0);
 
   const onChange = (e) => {
     setText(e.target.value);
     onDataTextUpdate(e.target.value, id);
   };
-
-  function countWords(text) {
-    return text.trim().split(/\s+/).length;
-  }
-
-  useEffect(() => {
-    if (!data?.text?.length) {
-      setWordCount(0);
-      return;
-    }
-    setWordCount(countWords(data.text));
-  }, [data.text]);
 
   const onEnter = (e) => {
     if (
@@ -59,12 +47,20 @@ function TTSInput({ id, data }) {
     ) {
       // get the width and height via bounding client rect
       const height = nodeRef.current.getBoundingClientRect().height;
-      onUserInputSend(id, height);
+      onUserInputSend(id, height, "ttsOutput", "tts");
+    }
+  };
+
+  const onSend = () => {
+    if (openAIInstance && text.trim().length > 0) {
+      // get the width and height via bounding client rect
+      const height = nodeRef.current.getBoundingClientRect().height;
+      onUserInputSend(id, height, "ttsOutput", "tts");
     }
   };
 
   const placeHolderText = openAIInstance
-    ? `The text to be spoken`
+    ? `The text to be spoken, Enter to send, Shift + Enter new line`
     : "Please add an API key";
 
   return (
@@ -141,19 +137,22 @@ function TTSInput({ id, data }) {
       <Handle type="source" position={Position.Bottom} />
       <Handle type="target" position={Position.Top} />
 
-      <div className="flex items-center justify-center w-full">
-        <div className="flex w-full justify-end pt-4 items-center space-x-2">
-          <p className="text-gray-500 text-sm mr-2">Word Count: {wordCount}</p>
-
-          <IoMdSend
-            className="text-2xl text-gray-500 cursor-pointer"
-            onClick={() =>
-              onUserInputSend(
-                id,
-                nodeRef?.current?.getBoundingClientRect().width
-              )
-            }
-          />
+      <div className="flex items-start justify-end space-x-4">
+        <div>
+          <Tooltip
+            position="bottom-full"
+            text="The transcriptions API takes as input the audio file you want to transcribe and the desired output file format for the transcription of the audio."
+          >
+            <button
+              disabled={!openAIInstance}
+              className={`border-2 border-gray-500 rounded-md whitespace-nowrap ${
+                !openAIInstance ? "opacity-50" : ""
+              }`}
+              onClick={onSend}
+            >
+              <span>Speak</span>
+            </button>
+          </Tooltip>
         </div>
       </div>
     </Container>

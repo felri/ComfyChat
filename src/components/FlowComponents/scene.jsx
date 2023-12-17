@@ -13,6 +13,7 @@ import TTSInput from "./ttsInput";
 import SttOutputNode from "./sttOutput";
 import SystemMessageInput from "./systemInput";
 import DropFilesNode from "./dropFiles";
+import TTSOutputNode from "./ttsOutput";
 import Controls from "./controls";
 import EditorNode from "./mediaEditor";
 import ChatOutputNode from "./chatOutput";
@@ -47,6 +48,7 @@ const nodeTypes = {
   ffmpeg: FFMpegNode,
   sttOutput: SttOutputNode,
   tts: TTSInput,
+  ttsOutput: TTSOutputNode,
 };
 
 function Flow() {

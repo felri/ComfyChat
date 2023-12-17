@@ -1,53 +1,16 @@
-import { useEffect, useState, useCallback, useRef, useMemo } from "react";
+import { useState, useCallback, useRef, useMemo } from "react";
 import { storeManager, useConfigStore, useFileStore } from "../../store";
 import { Handle, Position } from "reactflow";
 import Container from "../Common/container";
 import TextArea from "../Common/textarea";
-import { HiOutlineTrash } from "react-icons/hi2";
-import hljs from "highlight.js";
-import { IoIosAdd } from "react-icons/io";
 import PropTypes from "prop-types";
-import { IoStopCircleOutline } from "react-icons/io5";
-import { FaSave } from "react-icons/fa";
-import { IoIosRefresh } from "react-icons/io";
-import { CiEdit } from "react-icons/ci";
 import { uploadAudio } from "../../api/stt";
 import Dropdown from "../Common/dropdown";
 import { responseFormatSTT, languages } from "../../store/constants";
 import Loading from "../Common/loading";
 import "highlight.js/styles/github-dark.css"; // Or any other style you prefer
 import Tooltip from "../Common/tooltip";
-
-const AudioPlayer = ({ file }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = useRef(null);
-
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.load();
-    }
-  }, [file]);
-
-  return (
-    <div className="flex items-center justify-center w-full">
-      <audio
-        ref={audioRef}
-        controls
-        className="w-full h-10"
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-      >
-        <source src={file?.data} type="audio/mp3" />
-      </audio>
-    </div>
-  );
-};
-
-AudioPlayer.propTypes = {
-  file: PropTypes.shape({
-    data: PropTypes.string,
-  }),
-};
+import AudioPlayer from "../Common/audioPlayer";
 
 function SttOutputNode({ id, data }) {
   const containerRef = useRef(null);
@@ -124,7 +87,7 @@ function SttOutputNode({ id, data }) {
         <AudioPlayer file={file} />
 
         <div className="flex items-center justify-between w-full pt-4">
-          <div>
+          <div className="flex items-center justify-between space-x-4">
             <Dropdown
               label="Translate to"
               name="language"
@@ -147,7 +110,7 @@ function SttOutputNode({ id, data }) {
           <div className="flex items-start justify-between space-x-4">
             <div>
               <Tooltip
-                position="top-full"
+                position="bottom-full"
                 text="The transcriptions API takes as input the audio file you want to transcribe and the desired output file format for the transcription of the audio."
               >
                 <button

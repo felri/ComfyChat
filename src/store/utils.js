@@ -74,7 +74,7 @@ export function getMessageHistory(id, nodes, edges) {
     const currentNode = nodes.find((node) => node.id === currentNodeId);
 
     if (currentNode) {
-      if (currentNode.type === "systemMessage") {
+      if (currentNode.type === "systemMessage" && currentNode.data?.text) {
         // If system message is found, store its content.
         systemMessage = currentNode.data.text;
       } else if (currentNode.data?.text) {

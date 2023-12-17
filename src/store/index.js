@@ -157,13 +157,19 @@ const createStore = (id) =>
             edges: [...inputLayouted.edges],
           });
         },
-        onUserInputSend: (id, parentHeight) => {
+        onUserInputSend: (
+          id,
+          parentHeight,
+          type = "chatOutput",
+          childType = "text"
+        ) => {
           // create a new output node and edge
           const layouted = createNewNode(
             get().nodes,
             get().edges,
             id,
-            parentHeight
+            parentHeight,
+            type
           );
           const lastNode = layouted.nodes[layouted.nodes.length - 1];
 
@@ -173,7 +179,7 @@ const createStore = (id) =>
             layouted.edges,
             lastNode.id,
             parentHeight + 125,
-            "text"
+            childType
           );
 
           set({
@@ -266,6 +272,20 @@ const createStore = (id) =>
           }
 
           return get().findParentNodeByType(edges[0].source, type);
+        },
+        findChildNodeByType: (id, type) => {
+          const node = get().nodes.find((node) => node.id === id);
+          const edges = get().edges.filter((edge) => edge.source === id);
+
+          if (node.type === type) {
+            return node;
+          }
+
+          if (edges.length === 0) {
+            return null;
+          }
+
+          return get().findChildNodeByType(edges[0].target, type);
         },
         onAudioEditorSend: (id, start, end, type) => {
           const layouted = createNewNode(

@@ -123,7 +123,7 @@ function ApiKeyNode({ id }) {
               icon={button.icon}
               label={button.label}
               onClick={() =>
-                onChooseType(id, button.type, 320)
+                onChooseType(id, button.type, 290)
               }
             />
           ))}
