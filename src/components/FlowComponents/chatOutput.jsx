@@ -54,12 +54,22 @@ function ChatOutputNode({ id, data }) {
     const regex = /`([^`]+)`/g;
     return (
       "<p class='mt-3 chatoutput nodrag'>" +
-      escapeHtml(line).replace(
+      line.replace(
         regex,
         "<span class='font-bold bg-gray-700 p-1 rounded'>$1</span>"
       ) +
       "</p>\n"
     );
+  }
+
+  function processTwoAsteriskLine(line) {
+    const regex = /\*\*([^*]+)\*\*/g;
+    return (
+      line.replace(
+        regex,
+        "<span class='font-bold text-lg'>$1</span>"
+      )
+    )
   }
 
   function formatStreamContent(text) {
@@ -89,7 +99,7 @@ function ChatOutputNode({ id, data }) {
       } else if (inCodeBlock) {
         codeContent += line + "\n";
       } else {
-        formattedText += processSingleBacktickLine(line);
+        formattedText += processSingleBacktickLine(processTwoAsteriskLine(line));
       }
     }
 
