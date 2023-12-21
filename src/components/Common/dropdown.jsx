@@ -10,7 +10,7 @@ function Dropdown({
 }) {
   const handleChange = useCallback((evt) => {
     onChange(evt);
-  }, []);
+  }, [onChange]);
 
   return (
     <div className="flex flex-col w-full w-full text-center">

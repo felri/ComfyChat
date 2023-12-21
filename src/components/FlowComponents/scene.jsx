@@ -33,7 +33,7 @@ const selector = (state) => ({
   onConnect: state.onConnect,
   openAIConfig: state.openAIConfig,
   createOpenAIInstance: state.createOpenAIInstance,
-  deleteChatNode: state.deleteChatNode,
+  callbackOnNodeDelete: state.callbackOnNodeDelete,
   resetStore: state.resetStore,
   cleanEmptyEdges: state.cleanEmptyEdges,
 });
@@ -64,7 +64,7 @@ function Flow() {
     edges,
     onNodesChange,
     onEdgesChange,
-    deleteChatNode,
+    callbackOnNodeDelete,
     resetStore,
   } = store(selector, (state, next) => {
     return (
@@ -76,7 +76,7 @@ function Flow() {
       state.onConnect === next.onConnect &&
       state.openAIConfig === next.openAIConfig &&
       state.createOpenAIInstance === next.createOpenAIInstance &&
-      state.deleteChatNode === next.deleteChatNode &&
+      state.callbackOnNodeDelete === next.callbackOnNodeDelete &&
       state.resetStore === next.resetStore &&
       state.cleanEmptyEdges === next.cleanEmptyEdges
     );
@@ -111,7 +111,7 @@ function Flow() {
   };
 
   const onNodesDelete = (nodesDeleted) => {
-    deleteChatNode(nodesDeleted, nodes, edges);
+    callbackOnNodeDelete(nodesDeleted, nodes, edges);
   };
 
   const handleKeyPress = useCallback(

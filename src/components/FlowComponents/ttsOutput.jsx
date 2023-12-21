@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
-import { storeManager} from "../../store/storageManager";
+import { storeManager } from "../../store/storageManager";
 import { useConfigStore } from "../../store/useConfigStore";
 import { Handle, Position } from "reactflow";
 import Container from "../Common/container";
@@ -15,28 +15,25 @@ function TTSOutputNode({ id }) {
   const [audio, setAudio] = useState(null);
 
   const store = storeManager.getSelectedStore();
-  const { findParentNodeByType, findChildNodeByType } = store(
-    ({ findParentNodeByType, findChildNodeByType }) => ({
-      findParentNodeByType,
-      findChildNodeByType,
-    })
-  );
+  const { findNode } = store(({ findNode }) => ({
+    findNode,
+  }));
 
   const text = useMemo(() => {
-    const parent = findParentNodeByType(id, "tts");
+    const parent = findNode(id, "tts", "parent");
     if (parent) {
       return parent.data.text;
     }
     return "";
-  }, [findParentNodeByType, id]);
+  }, [findNode, id]);
 
   const childNode = useMemo(() => {
-    const child = findChildNodeByType(id, "tts");
+    const child = findNode(id, "tts", "child");
     if (child) {
       return child;
     }
     return null;
-  }, [findChildNodeByType, id]);
+  }, [findNode, id]);
 
   const { TTSModel, openAIInstance, voice, language, speed } = useConfigStore(
     ({ TTSModel, openAIInstance, voice, language, speed }) => ({
@@ -91,9 +88,12 @@ function TTSOutputNode({ id }) {
         {loading && <Loading />}
         {audio && <AudioPlayer file={audio} />}
         {regenerate && (
-            <button className="p-2 border border-gray-300 rounded-md duration-200 ease-in-out" onClick={sendText}>
-              Regenerate
-            </button>
+          <button
+            className="p-2 border border-gray-300 rounded-md duration-200 ease-in-out"
+            onClick={sendText}
+          >
+            Regenerate
+          </button>
         )}
       </div>
     </Container>

@@ -57,14 +57,14 @@ const createStore = (id) =>
             }),
           }));
         },
-        deleteUserNode: (id) => {
+        deleteNode: (id) => {
           const layouted = deleteOneNode(get().nodes, get().edges, id);
           set({
             nodes: layouted.nodes,
             edges: layouted.edges,
           });
         },
-        deleteChatNode: (deletedNodes, nodes, edges) => {
+        callbackOnNodeDelete: (deletedNodes, nodes, edges) => {
           deletedNodes.forEach((node) => {
             const layouted = deleteOneNode(nodes, edges, node.id);
             set({
@@ -82,34 +82,40 @@ const createStore = (id) =>
             return acc + curr.text.split(" ").length;
           }, 0);
         },
+        findNode(id, type, searchDirection) {
+          const { nodes, edges } = get();
 
-        findParentNodeByType: (id, type) => {
-          const node = get().nodes.find((node) => node.id === id);
-          const edges = get().edges.filter((edge) => edge.target === id);
-
+          const node = nodes.find((node) => node.id === id);
           if (node?.type === type) {
             return node;
           }
 
-          if (edges?.length === 0) {
-            return null;
+          let relevantEdges = [];
+          if (searchDirection === "parent") {
+            relevantEdges = edges.filter((edge) => edge.target === id);
+            if (relevantEdges.length === 0) {
+              return null;
+            }
+            return get().findNode(
+              relevantEdges[0].source,
+              type,
+              searchDirection
+            );
+          } else if (searchDirection === "child") {
+            relevantEdges = edges.filter((edge) => edge.source === id);
+            if (relevantEdges.length === 0) {
+              return null;
+            }
+            return get().findNode(
+              relevantEdges[0].target,
+              type,
+              searchDirection
+            );
+          } else {
+            throw new Error(
+              "Invalid search direction. Use 'parent' or 'child'."
+            );
           }
-
-          return get().findParentNodeByType(edges[0].source, type);
-        },
-        findChildNodeByType: (id, type) => {
-          const node = get().nodes.find((node) => node.id === id);
-          const edges = get().edges.filter((edge) => edge.source === id);
-
-          if (node?.type === type) {
-            return node;
-          }
-
-          if (edges.length === 0) {
-            return null;
-          }
-
-          return get().findChildNodeByType(edges[0].target, type);
         },
         createAndUpdateNode: (id, parentHeight, type, extraData = {}) => {
           const layouted = createNewNode(
@@ -144,12 +150,16 @@ const createStore = (id) =>
 
           set({ nodes });
         },
-        // Update the specific functions to use the new, more generic ones.
         onChooseType: (id, type, parentHeight = 250) => {
-          const { nodes } = get().createAndUpdateNode(id, 250, "systemMessage", {
-            text: "You are an AI Assistant talking with a human.",
-            type,
-          });
+          const { nodes } = get().createAndUpdateNode(
+            id,
+            250,
+            "systemMessage",
+            {
+              text: "You are an AI Assistant talking with a human.",
+              type,
+            }
+          );
           const lastNode = nodes[nodes.length - 1];
           get().createAndUpdateNode(lastNode.id, parentHeight, type, { type });
         },
@@ -161,7 +171,8 @@ const createStore = (id) =>
         ) => {
           const { nodes } = get().createAndUpdateNode(id, parentHeight, type);
           const lastNode = nodes[nodes.length - 1];
-          get().createAndUpdateNode(lastNode.id, parentHeight + 125, childType);
+          console.log(parentHeight);
+          get().createAndUpdateNode(lastNode.id, parentHeight * 2 - 120, childType);
         },
         createNewSTTNode: (id, parentHeight) => {
           get().createAndUpdateNode(id, parentHeight, "stt", { type: "stt" });
@@ -179,9 +190,14 @@ const createStore = (id) =>
           get().createAndUpdateNode(id, 200, "sttOutput");
         },
         onAudioDrop: (id, file, parentHeight) => {
-          const { nodes } = get().createAndUpdateNode(id, parentHeight, "editor", {
-            modelType: "stt",
-          });
+          const { nodes } = get().createAndUpdateNode(
+            id,
+            parentHeight,
+            "editor",
+            {
+              modelType: "stt",
+            }
+          );
 
           const lastNode = nodes[nodes.length - 1];
           useFileStore.setState({

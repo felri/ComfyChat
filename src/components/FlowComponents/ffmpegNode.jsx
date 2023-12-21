@@ -29,9 +29,9 @@ function FFmpegNode({ id, data, type }) {
   const nodeRef = useRef(null);
 
   const store = storeManager.getSelectedStore();
-  const { findParentNodeByType, createSTTOutputNode } = store(
-    ({ findParentNodeByType, createSTTOutputNode }) => ({
-      findParentNodeByType,
+  const { findNode, createSTTOutputNode } = store(
+    ({ findNode, createSTTOutputNode }) => ({
+      findNode,
       createSTTOutputNode,
     })
   );
@@ -47,8 +47,8 @@ function FFmpegNode({ id, data, type }) {
   );
 
   const mediaParentNode = useMemo(() => {
-    return findParentNodeByType(id, "editor");
-  }, [findParentNodeByType, id]);
+    return findNode(id, "editor", "parent");
+  }, [findNode, id]);
 
   useEffect(() => {
     if (!ffmpeg) {

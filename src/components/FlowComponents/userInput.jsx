@@ -95,7 +95,7 @@ Shift + N to create new chat
             onClick={() =>
               onUserInputSend(
                 id,
-                nodeRef?.current?.getBoundingClientRect().width
+                nodeRef?.current?.getBoundingClientRect().height
               )
             }
           />

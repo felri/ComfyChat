@@ -30,20 +30,20 @@ function SttOutputNode({ id, data }) {
 
   const { files } = useFileStore(({ files }) => ({ files }));
 
-  const { findParentNodeByType, onDataTextUpdate } = store(
-    ({ findParentNodeByType, onDataTextUpdate }) => ({
-      findParentNodeByType,
+  const { findNode, onDataTextUpdate } = store(
+    ({ findNode, onDataTextUpdate }) => ({
+      findNode,
       onDataTextUpdate,
     })
   );
 
   const file = useMemo(() => {
     if (!id) return null;
-    const parent = findParentNodeByType(id, "ffmpeg");
+    const parent = findNode(id, "ffmpeg", "parent");
     if (!parent) return null;
     const file = files.find((f) => f.id === parent.id);
     return file;
-  }, [id, findParentNodeByType, files]);
+  }, [id, findNode, files]);
 
   const handleSend = useCallback(
     async (type) => {

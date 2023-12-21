@@ -12,7 +12,7 @@ function Container({
   id,
 }) {
   const store = storeManager.getSelectedStore();
-  const { deleteUserNode } = store(useCallback((state) => state, []));
+  const { deleteNode } = store(useCallback((state) => state, []));
 
   const [selectedNodes, setSelectedNodes] = useState([]);
 
@@ -39,7 +39,7 @@ function Container({
           <HiOutlineTrash
             opacity={0.7}
             size={20}
-            onClick={() => deleteUserNode(id)}
+            onClick={() => deleteNode(id)}
           />
         </div>
       )}
