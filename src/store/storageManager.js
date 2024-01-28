@@ -51,7 +51,13 @@ const createStore = (id) =>
           set((state) => ({
             nodes: state.nodes.map((node) => {
               if (node.id === id) {
-                return { ...node, data: { text } };
+                return {
+                  ...node,
+                  data: {
+                    ...node.data,
+                    text,
+                  },
+                };
               }
               return node;
             }),
