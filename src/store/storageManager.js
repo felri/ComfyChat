@@ -177,8 +177,20 @@ const createStore = (id) =>
         ) => {
           const { nodes } = get().createAndUpdateNode(id, parentHeight, type);
           const lastNode = nodes[nodes.length - 1];
-          console.log(parentHeight);
-          get().createAndUpdateNode(lastNode.id, parentHeight * 2 - 120, childType);
+          console.log(nodes);
+          // data
+          //   : 
+          // {text: '', id: '8'}
+          // id
+          // : 
+          // "8"
+          // position
+          // : 
+          // {x: 1545, y: 2356.5200805664062}
+          // type
+          // : 
+          // "chatOutput"
+          get().createAndUpdateNode(lastNode.id, 450, childType);
         },
         createNewSTTNode: (id, parentHeight) => {
           get().createAndUpdateNode(id, parentHeight, "stt", { type: "stt" });

@@ -92,12 +92,13 @@ Shift + N to create new chat
 
           <IoMdSend
             className="text-2xl text-gray-500 cursor-pointer"
-            onClick={() =>
+            onClick={() => {
+              console.log(nodeRef?.current);
               onUserInputSend(
                 id,
-                nodeRef?.current?.getBoundingClientRect().height
+                nodeRef?.current?.getBoundingClientRect().height,
               )
-            }
+            }}
           />
         </div>
       </div>

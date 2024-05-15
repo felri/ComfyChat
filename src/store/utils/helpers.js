@@ -64,7 +64,6 @@ export function getStoredStoreIds() {
 }
 
 export function getMessageHistory(id, nodes, edges) {
-  console.log("getMessageHistory", nodes, edges);
   const history = [];
 
   let currentNodeId = id;
