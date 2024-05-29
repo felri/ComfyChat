@@ -19,7 +19,6 @@ import Controls from "./controls";
 import EditorNode from "./mediaEditor";
 import ChatOutputNode from "./chatOutput";
 import History from "../Common/history";
-import NoteNode from "../FlowComponents/noteNode"
 
 import {  CiPaperplane } from "react-icons/ci";
 
@@ -38,6 +37,7 @@ const selector = (state) => ({
   createOpenAIInstance: state.createOpenAIInstance,
   callbackOnNodeDelete: state.callbackOnNodeDelete,
   resetStore: state.resetStore,
+  createAndUpdateNode: state.createAndUpdateNode,
   cleanEmptyEdges: state.cleanEmptyEdges,
 });
 
@@ -82,6 +82,7 @@ function Flow() {
       state.createOpenAIInstance === next.createOpenAIInstance &&
       state.callbackOnNodeDelete === next.callbackOnNodeDelete &&
       state.resetStore === next.resetStore &&
+      state.createAndUpdateNode === next.createAndUpdateNode && 
       state.cleanEmptyEdges === next.cleanEmptyEdges
     );
   });
