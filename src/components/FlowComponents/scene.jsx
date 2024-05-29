@@ -19,6 +19,9 @@ import Controls from "./controls";
 import EditorNode from "./mediaEditor";
 import ChatOutputNode from "./chatOutput";
 import History from "../Common/history";
+import NoteNode from "../FlowComponents/noteNode"
+
+import {  CiPaperplane } from "react-icons/ci";
 
 const selectedSelector = (state) => ({
   selectedStoreId: state.selectedStoreId,
@@ -66,6 +69,7 @@ function Flow() {
     onEdgesChange,
     callbackOnNodeDelete,
     resetStore,
+    createAndUpdateNode,
   } = store(selector, (state, next) => {
     return (
       state.nodes === next.nodes &&
@@ -112,6 +116,12 @@ function Flow() {
 
   const onNodesDelete = (nodesDeleted) => {
     callbackOnNodeDelete(nodesDeleted, nodes, edges);
+  };
+
+  const addNoteNode = () => {
+    
+    createAndUpdateNode("note", 0, "text");
+    // createAndUpdateNode();
   };
 
   const handleKeyPress = useCallback(
@@ -228,6 +238,9 @@ function Flow() {
 
         <Background />
         <Panel position="bottom-left">
+        <Tooltip text="New note " className="mr-4">
+          <CiPaperplane onClick={addNoteNode} size={35} />
+        </Tooltip>
           <Controls resetStore={resetStore} />
         </Panel>
       </ReactFlow>
